@@ -1138,35 +1138,54 @@ function spacing(a,b,ca,cb,ia,ib,flg,clr,fclr){
   opts.push({cc:fb/2+oa/2+ia+fclr,gov:`Flange B vs ${ia?'insulated ':''}pipe A`});}
  return opts.reduce((m,o)=>o.cc>m.cc?o:m);
 }
-function spSVG(a,b,ca,cb,ia,ib,flg,cc){
- const ra=odmm(a)/2,rb=odmm(b)/2,fa=flg?flmm(ca,a)/2:0,fb=flg?flmm(cb,b)/2:0;
+/* every clearance case for the pair, so the page can show which one governs */
+function spCands(a,b,ca,cb,ia,ib,flg,clr,fclr){
+ const oa=odmm(a),ob=odmm(b);
+ const o=[{k:'pp',cc:oa/2+ia+ob/2+ib+clr,gap:clr,lbl:ia||ib?'Pipe or insulation, A to B':'Pipe OD, A to B'}];
+ if(flg){const fa=flmm(ca,a),fb=flmm(cb,b);if(fa==null||fb==null)return o;
+  o.push({k:'fa',cc:fa/2+ob/2+ib+fclr,gap:fclr,lbl:`Flange A to ${ib?'insulated ':''}pipe B`});
+  o.push({k:'fb',cc:fb/2+oa/2+ia+fclr,gap:fclr,lbl:`Flange B to ${ia?'insulated ':''}pipe A`});}
+ return o;}
+/* section at the closest point: both lines to scale, governing surfaces and gap highlighted */
+function spSVG(a,b,ca,cb,ia,ib,flg,cc,gov){
+ const ra=odmm(a)/2,rb=odmm(b)/2,Ra=flRow(ca,a),Rb=flRow(cb,b);
+ const fa=flg&&Ra?Ra.O*12.7:0,fb=flg&&Rb?Rb.O*12.7:0;
  const ea=Math.max(ra+ia,fa),eb=Math.max(rb+ib,fb);
- const W=cc+ea+eb, H=2*Math.max(ea,eb), pad=W*0.05, vbW=W+2*pad, sc=vbW/560;
- const x1=pad+ea, x2=x1+cc, cy=pad+H/2, vbH=H+2*pad+56*sc;
- const fs=11*sc, fm=10*sc, sw=sc;
- const circ=(cx,r,cls)=>`<circle cx="${cx}" cy="${cy}" r="${r}" class="${cls}" style="stroke-width:${1.2*sw}"/>`;
- let g='';
- /* clearance band between nearest surfaces */
- const ia_out=ra+ia, ib_out=rb+ib;
- const pairs=[[ia_out,ib_out]]; if(flg){pairs.push([fa,ib_out],[ia_out,fb]);}
- const near=pairs.reduce((m,p)=>(p[0]+p[1]>m[0]+m[1]?p:m));
- g+=`<rect class="sp-gap" x="${x1+near[0]}" y="${cy-H/2}" width="${Math.max(cc-near[0]-near[1],0)}" height="${H}"/>`;
- if(flg){g+=circ(x1,fa,'sp-flg')+circ(x2,fb,'sp-flg');}
- if(ia)g+=circ(x1,ra+ia,'sp-ins'); if(ib)g+=circ(x2,rb+ib,'sp-ins');
- g+=circ(x1,ra,'sp-pipe')+circ(x2,rb,'sp-pipe');
- g+=`<line x1="${x1}" y1="${cy-H/2-4*sc}" x2="${x1}" y2="${cy+H/2+18*sc}" class="s-cl" style="stroke-width:${.8*sw};stroke-dasharray:${8*sc} ${3*sc} ${2*sc} ${3*sc}"/>`;
- g+=`<line x1="${x2}" y1="${cy-H/2-4*sc}" x2="${x2}" y2="${cy+H/2+18*sc}" class="s-cl" style="stroke-width:${.8*sw};stroke-dasharray:${8*sc} ${3*sc} ${2*sc} ${3*sc}"/>`;
- const yd=cy+H/2+14*sc;
- g+=`<line x1="${x1}" y1="${yd}" x2="${x2}" y2="${yd}" class="s-dim" style="stroke-width:${sw}"/>`;
- g+=`<path d="M${x1} ${yd} l${6*sc} ${-3*sc} v${6*sc}z M${x2} ${yd} l${-6*sc} ${-3*sc} v${6*sc}z" fill="var(--accent)"/>`;
- g+=`<text x="${(x1+x2)/2}" y="${yd+15*sc}" text-anchor="middle" class="t-dim" style="font-size:${fs}px">C–C ${Lmm(cc)} ${ul()}</text>`;
- g+=`<text x="${x1}" y="${cy+4*sc}" text-anchor="middle" class="sp-t" style="font-size:${fs}px">A ${a}″</text>`;
- g+=`<text x="${x2}" y="${cy+4*sc}" text-anchor="middle" class="sp-t" style="font-size:${fs}px">B ${b}″</text>`;
- const lg=[['sp-pipe','Pipe OD'],['sp-ins','Insulation'],['sp-flg','Flange OD'],['sp-gap','Clearance']];
- let lx=pad, ly=vbH-8*sc;
- lg.forEach(([c,t])=>{g+=`<rect x="${lx}" y="${ly-9*sc}" width="${12*sc}" height="${9*sc}" class="${c}" style="stroke-width:${sw}"/><text x="${lx+16*sc}" y="${ly}" class="sp-tm" style="font-size:${fm}px">${t}</text>`;lx+=100*sc;});
- return `<svg class="spsvg" viewBox="0 0 ${vbW} ${vbH}" role="img" aria-label="Cross-section of the two lines at minimum spacing">${g}</svg>`;
-}
+ const sm=innerWidth<700,VW=sm?560:960,VH=sm?380:430,padX=sm?30:70,top=84,bot=78;
+ const k=Math.min((VW-2*padX)/(cc+ea+eb),(VH-top-bot)/(2*Math.max(ea,eb)));
+ const x1=VW/2-(cc+eb-ea)*k/2-0, cx1=(VW-(cc+ea+eb)*k)/2+ea*k, cx2=cx1+cc*k, cy=top+(VH-top-bot)/2;
+ const P=v=>+(v).toFixed(1);
+ const wall=n=>{const w=PIPEMAP[n][2];return ((w.STD??w['40']??Object.values(w)[0])*25.4);};
+ const bolts=(cx,R,cls)=>{if(!R)return '';const r=R.BC*12.7*k,h=(R.dv+.125)*12.7*k;let s='';for(let i=0;i<R.n;i++){const t=Math.PI*2*(i+.5)/R.n;s+=`<circle cx="${P(cx+r*Math.cos(t))}" cy="${P(cy+r*Math.sin(t))}" r="${P(Math.max(h,1.4))}" class="sx-hole"/>`;}return s;};
+ const line=(cx,r,ins,f,R,n,id)=>`
+  ${f?`<g class="sx-flg${gov==='f'+id?' gov':''}"><circle cx="${P(cx)}" cy="${cy}" r="${P(f*k)}"/>${bolts(cx,R)}</g>`:''}
+  ${ins?`<circle cx="${P(cx)}" cy="${cy}" r="${P((r+ins)*k)}" class="sx-ins${gov==='pp'||gov===(id==='a'?'fb':'fa')?' gov':''}"/>`:''}
+  <circle cx="${P(cx)}" cy="${cy}" r="${P(r*k)}" class="sx-pipe${!ins&&(gov==='pp'||gov===(id==='a'?'fb':'fa'))?' gov':''}"/>
+  <circle cx="${P(cx)}" cy="${cy}" r="${P(Math.max((r-wall(n))*k,1))}" class="sx-bore"/>
+  <path d="M${P(cx-8)} ${cy}h16M${P(cx)} ${cy-8}v16" class="sx-cl"/>`;
+ /* governing surfaces */
+ const ga=gov==='fa'?fa:ra+ia, gb=gov==='fb'?fb:rb+ib;
+ const gx1=cx1+ga*k, gx2=cx2-gb*k;
+ const tw=t=>t.length*7.4+18;
+ const tag=(x,y,t,cls='')=>`<rect x="${P(x-tw(t)/2)}" y="${y-13}" width="${P(tw(t))}" height="22" rx="5" class="sx-tag ${cls}"/><text x="${P(x)}" y="${y+2}" text-anchor="middle" class="sx-tt ${cls}">${t}</text>`;
+ const yT=top-38, yB=VH-bot+34;
+ const ccTxt=`C–C ${Lmm(cc)} ${ul()}`, gapMm=(cc-ga-gb);
+ return `<svg class="sxsvg" viewBox="0 0 ${VW} ${VH}" role="img" aria-label="Section through both lines at the closest point, centre-to-centre ${Lmm(cc)} ${ul()}">
+ <defs><marker id="sxA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 1L10 5L0 9z" class="sx-ah"/></marker></defs>
+ <rect x="${P(gx1)}" y="${top-6}" width="${P(Math.max(gx2-gx1,0))}" height="${VH-top-bot+12}" class="sx-gap"/>
+ ${line(cx1,ra,ia,fa,Ra,a,'a')}${line(cx2,rb,ib,fb,Rb,b,'b')}
+ <line x1="${P(cx1)}" y1="${yT-8}" x2="${P(cx1)}" y2="${cy}" class="sx-ext"/><line x1="${P(cx2)}" y1="${yT-8}" x2="${P(cx2)}" y2="${cy}" class="sx-ext"/>
+ <line x1="${P(cx1)}" y1="${yT}" x2="${P(cx2)}" y2="${yT}" class="sx-dim" marker-start="url(#sxA)" marker-end="url(#sxA)"/>
+ ${tag((cx1+cx2)/2,yT-1,ccTxt,'acc')}
+ <line x1="${P(gx1)}" y1="${cy}" x2="${P(gx2)}" y2="${cy}" class="sx-dim sx-gd" marker-start="url(#sxA)" marker-end="url(#sxA)"/>
+ ${tag((gx1+gx2)/2,cy+30,`gap ${Lmm(gapMm)} (min ${Lmm(gov==='pp'?+SP.clr:+SP.fclr)})`,'ok')}
+ ${tag(cx1,yB,`A · ${a}″ Cl ${ca}${ia?` · ins ${ia}`:''}`)}${tag(cx2,yB,`B · ${b}″ Cl ${cb}${ib?` · ins ${ib}`:''}`)}
+ </svg>`;}
+let SXV=store.get('sxv','2d');
+function spc3D(r,ia,ib,govK){const st=$('#sxStage');if(!st)return;st.classList.add('is3d');
+ const d={cc:rup(r.cc,+SP.rnd),flg:SP.flg,gov:govK,unit:ul(),fmt:v=>Lmm(v),
+  a:{nps:SP.a,od:odmm(SP.a),ins:ia,fl:flRow(SP.ca,SP.a)},b:{nps:SP.b,od:odmm(SP.b),ins:ib,fl:flRow(SP.cb,SP.b)}};
+ import('./spacing3d.js').then(m=>m.show(st,d)).catch(()=>{st.innerHTML='<p class="note" style="padding:20px">The 3D view could not load in this browser. Use the section view.</p>';});}
 function renderSpacing(){
  const ia=SP.ina?+SP.ta||0:0, ib=SP.inb?+SP.tb||0:0;
  const r=spacing(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,+SP.clr,+SP.fclr);
@@ -1180,6 +1199,7 @@ function renderSpacing(){
   const x=spacing(SP.a,SP.b,SP.ca,SP.cb,ins?ia:0,ins?ib:0,fl,+SP.clr,+SP.fclr);
   const mine=fl===SP.flg&&ins===true;
   return `<tr${(fl===SP.flg&&(ins?(ia||ib):!(ia||ib)))?' class="best"':''}><td>${x?Lmm(rup(x.cc,+SP.rnd)):'—'}</td><td>${fl?'With flanges':'No flanges'}</td><td>${ins?(ia||ib?`Insulated (A ${ia||0} / B ${ib||0} mm)`:'Insulated (none set)'):'Bare pipe'}</td><td>${x?Lmm(x.cc,1):'—'}</td><td style="text-align:left">${x?x.gov:'Size not in class'}</td></tr>`;}).join('');
+ const cands=r?spCands(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,+SP.clr,+SP.fclr):[];const govK=r?cands.reduce((m,c)=>c.cc>m.cc?c:m).k:'';const maxC=r?Math.max(...cands.map(c=>c.cc)):1;
  const sbs=flmm(SP.ca,SP.a)!=null&&flmm(SP.cb,SP.b)!=null?flmm(SP.ca,SP.a)/2+flmm(SP.cb,SP.b)/2+(+SP.fclr):null;
 
  /* matrix */
@@ -1196,13 +1216,19 @@ function renderSpacing(){
     <label>Flanges<select class="sel" data-k="flg"><option value="1"${SP.flg?' selected':''}>With flanges</option><option value="0"${!SP.flg?' selected':''}>No flanges</option></select></label>
     <label>Round up to, mm<select class="sel" data-k="rnd">${[1,5,10,25,50].map(v=>`<option${v==SP.rnd?' selected':''}>${v}</option>`).join('')}</select></label></div>
   </div>
-  <div class="calc">
-   <div class="out" style="border-top:0;padding-top:0"><span class="lbl" style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Minimum C–C, line A to line B</span>
-    <div class="big" style="font-size:30px">${r?`${Lmm(rup(r.cc,+SP.rnd))} ${ul()}`:'Size not available in that class'}</div>
-    ${r?`<p style="margin:2px 0 0">Calculated ${Lmm(r.cc,1)} ${ul()}, rounded up to ${SP.rnd} mm. Governed by <b>${r.gov}</b>.</p>`:''}</div>
-   ${r?spSVG(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,rup(r.cc,+SP.rnd)):''}
+  <div class="calc sx-res">
+   <span class="lbl">Minimum C–C, line A to line B</span>
+   <div class="sx-big">${r?`${Lmm(rup(r.cc,+SP.rnd))}<small>${ul()}</small>`:'—'}</div>
+   ${r?`<p class="sx-sub">Exact ${Lmm(r.cc,1)} ${ul()}, rounded up to ${SP.rnd} mm.</p>`:'<p class="sx-sub">Size not available in that flange class.</p>'}
+   ${r?`<ul class="sx-cands">${cands.map(c=>`<li class="${c.k===govK?'gov':''}"><span class="sx-cl-l">${c.lbl}${c.k===govK?' <b>governs</b>':''}</span><span class="sx-bar"><i style="width:${(c.cc/maxC*100).toFixed(1)}%"></i></span><span class="sx-v">${Lmm(c.cc,0)}</span></li>`).join('')}</ul>`:''}
   </div>
  </div>
+ ${r?`<section class="sx-card">
+  <div class="sx-head"><div>${SXV==='2d'?'<h3>Section at the closest point</h3><p>Both lines to scale. The governing surfaces are outlined in blue and the clearance between them is shaded.</p>':'<h3>Rack view</h3><p>Both lines on a rack beam at the calculated C–C, flanges offset so each sits beside the plain pipe of the other line.</p>'}</div>
+   <div class="seg" id="sxView" role="group" aria-label="Drawing view"><button type="button" data-v="2d" aria-pressed="${SXV==='2d'}">Section</button><button type="button" data-v="3d" aria-pressed="${SXV==='3d'}">3D rack view</button></div></div>
+  <div class="sx-stage" id="sxStage">${SXV==='2d'?spSVG(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,rup(r.cc,+SP.rnd),govK):''}</div>
+  ${SXV==='2d'?'':'<!--'}<div class="sx-key"><span><i class="k-pipe"></i>Pipe</span>${ia||ib?'<span><i class="k-ins"></i>Insulation</span>':''}${SP.flg?'<span><i class="k-flg"></i>Flange with bolt holes</span>':''}<span><i class="k-gap"></i>Clearance</span><span><i class="k-gov"></i>Governing surface</span></div>${SXV==='2d'?'':'-->'}
+ </section>`:''}
  <h3 style="margin:20px 0 8px;font-size:20px">Same pair, every case</h3>
  <div class="tw"><table class="cases"><thead><tr><th>Min C–C<small>${ul()}, rounded</small></th><th style="text-align:left">Flanges</th><th style="text-align:left">Insulation</th><th>Exact<small>${ul()}</small></th><th style="text-align:left">Governed by</th></tr></thead><tbody>${cases}</tbody></table></div>
  ${sbs!=null?`<p class="note"><b>Flanges side by side</b> (not recommended, avoid by staggering): ${Lmm(rup(sbs,+SP.rnd))} ${ul()} C–C, flange OD to flange OD plus the flange gap.</p>`:''}
@@ -1221,6 +1247,8 @@ function renderSpacing(){
   const k=el.dataset.k;let v=el.value;
   if(['ina','inb','flg','mflg'].includes(k))v=v==='1';
   SP[k]=v;saveSP();renderSpacing();}));
+ const sv=pane.querySelector('#sxView');if(sv)sv.addEventListener('click',e=>{const bt=e.target.closest('button[data-v]');if(!bt)return;SXV=bt.dataset.v;store.set('sxv',SXV);renderSpacing();});
+ if(r&&SXV==='3d')spc3D(r,ia,ib,govK);
  pane.querySelector('.mx').addEventListener('click',e=>{const td=e.target.closest('td[data-a]');if(!td)return;SP.a=td.dataset.a;SP.b=td.dataset.b;saveSP();renderSpacing();pane.scrollIntoView({behavior:'smooth',block:'start'});});
 }
 
