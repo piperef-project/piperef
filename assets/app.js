@@ -1181,11 +1181,6 @@ function spSVG(a,b,ca,cb,ia,ib,flg,cc,gov){
  ${tag((gx1+gx2)/2,cy+30,`gap ${Lmm(gapMm)} (min ${Lmm(gov==='pp'?+SP.clr:+SP.fclr)})`,'ok')}
  ${tag(cx1,yB,`A · ${a}″ Cl ${ca}${ia?` · ins ${ia}`:''}`)}${tag(cx2,yB,`B · ${b}″ Cl ${cb}${ib?` · ins ${ib}`:''}`)}
  </svg>`;}
-let SXV=store.get('sxv','2d');
-function spc3D(r,ia,ib,govK){const st=$('#sxStage');if(!st)return;st.classList.add('is3d');
- const d={cc:rup(r.cc,+SP.rnd),flg:SP.flg,gov:govK,unit:ul(),fmt:v=>Lmm(v),
-  a:{nps:SP.a,od:odmm(SP.a),ins:ia,fl:flRow(SP.ca,SP.a)},b:{nps:SP.b,od:odmm(SP.b),ins:ib,fl:flRow(SP.cb,SP.b)}};
- import('./spacing3d.js').then(m=>m.show(st,d)).catch(()=>{st.innerHTML='<p class="note" style="padding:20px">The 3D view could not load in this browser. Use the section view.</p>';});}
 function renderSpacing(){
  const ia=SP.ina?+SP.ta||0:0, ib=SP.inb?+SP.tb||0:0;
  const r=spacing(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,+SP.clr,+SP.fclr);
@@ -1224,10 +1219,9 @@ function renderSpacing(){
   </div>
  </div>
  ${r?`<section class="sx-card">
-  <div class="sx-head"><div>${SXV==='2d'?'<h3>Section at the closest point</h3><p>Both lines to scale. The governing surfaces are outlined in blue and the clearance between them is shaded.</p>':'<h3>Rack view</h3><p>Both lines on a rack beam at the calculated C–C, flanges offset so each sits beside the plain pipe of the other line.</p>'}</div>
-   <div class="seg" id="sxView" role="group" aria-label="Drawing view"><button type="button" data-v="2d" aria-pressed="${SXV==='2d'}">Section</button><button type="button" data-v="3d" aria-pressed="${SXV==='3d'}">3D rack view</button></div></div>
-  <div class="sx-stage" id="sxStage">${SXV==='2d'?spSVG(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,rup(r.cc,+SP.rnd),govK):''}</div>
-  ${SXV==='2d'?'':'<!--'}<div class="sx-key"><span><i class="k-pipe"></i>Pipe</span>${ia||ib?'<span><i class="k-ins"></i>Insulation</span>':''}${SP.flg?'<span><i class="k-flg"></i>Flange with bolt holes</span>':''}<span><i class="k-gap"></i>Clearance</span><span><i class="k-gov"></i>Governing surface</span></div>${SXV==='2d'?'':'-->'}
+  <div class="sx-head"><div><h3>Section at the closest point</h3><p>Both lines to scale. The governing surfaces are outlined in blue and the clearance between them is shaded.</p></div></div>
+  <div class="sx-stage" id="sxStage">${spSVG(SP.a,SP.b,SP.ca,SP.cb,ia,ib,SP.flg,rup(r.cc,+SP.rnd),govK)}</div>
+  <div class="sx-key"><span><i class="k-pipe"></i>Pipe</span>${ia||ib?'<span><i class="k-ins"></i>Insulation</span>':''}${SP.flg?'<span><i class="k-flg"></i>Flange with bolt holes</span>':''}<span><i class="k-gap"></i>Clearance</span><span><i class="k-gov"></i>Governing surface</span></div>
  </section>`:''}
  <h3 style="margin:20px 0 8px;font-size:20px">Same pair, every case</h3>
  <div class="tw"><table class="cases"><thead><tr><th>Min C–C<small>${ul()}, rounded</small></th><th style="text-align:left">Flanges</th><th style="text-align:left">Insulation</th><th>Exact<small>${ul()}</small></th><th style="text-align:left">Governed by</th></tr></thead><tbody>${cases}</tbody></table></div>
@@ -1247,8 +1241,6 @@ function renderSpacing(){
   const k=el.dataset.k;let v=el.value;
   if(['ina','inb','flg','mflg'].includes(k))v=v==='1';
   SP[k]=v;saveSP();renderSpacing();}));
- const sv=pane.querySelector('#sxView');if(sv)sv.addEventListener('click',e=>{const bt=e.target.closest('button[data-v]');if(!bt)return;SXV=bt.dataset.v;store.set('sxv',SXV);renderSpacing();});
- if(r&&SXV==='3d')spc3D(r,ia,ib,govK);
  pane.querySelector('.mx').addEventListener('click',e=>{const td=e.target.closest('td[data-a]');if(!td)return;SP.a=td.dataset.a;SP.b=td.dataset.b;saveSP();renderSpacing();pane.scrollIntoView({behavior:'smooth',block:'start'});});
 }
 
