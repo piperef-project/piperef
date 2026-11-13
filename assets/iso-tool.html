@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Iso Revision Compare</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f4f1; --panel:#ffffff; --ink:#1d2329; --muted:#66707a; --line:#d9ddd8;
+  --accent:#1f4e79; --accent-soft:#e6eef6;
+  --rem:#d0312d; --add:#13893f; --mod:#d97a00; --mov:#6b4fbb; --same:#9aa3ab;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html.embed header{display:none}
+html.embed main{padding-top:12px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px}
+header{background:#14212e;color:#fff;padding:14px 20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:16px 16px}
+header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.3px}
+header h1 span{font-family:var(--mono);font-weight:400;color:#8fb3d6;font-size:13px;margin-left:6px}
+header p{margin:0;color:#b8c4cf;font-size:13px}
+main{max-width:1500px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{border:1px solid var(--line);background:var(--panel);padding:9px 16px;border-radius:8px;cursor:pointer;font:600 14px var(--sans);color:var(--muted)}
+.tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.drops{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:700px){.drops{grid-template-columns:1fr}}
+.drop{border:2px dashed #b9c2c9;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px;cursor:pointer;position:relative;transition:.15s;min-height:96px}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop.has{border-style:solid}
+.drop .tag{font:600 11px var(--mono);letter-spacing:1px;text-transform:uppercase}
+.drop.old .tag{color:var(--rem)} .drop.new .tag{color:var(--add)}
+.drop .title{font-weight:600}
+.drop .fname{font-family:var(--mono);font-size:12px;color:var(--muted);word-break:break-all}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.opts{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:12px}
+.opt{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.opt select,.opt input[type=number],.opt input[type=text]{font:13px var(--sans);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink)}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);cursor:pointer;padding-bottom:6px}
+button{font:600 13px var(--sans);border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 12px;cursor:pointer}
+button:hover{border-color:#9aa6b1}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;padding:9px 20px;font-size:14px}
+button.primary:disabled{opacity:.45;cursor:not-allowed}
+button.on{background:#14212e;color:#fff;border-color:#14212e}
+.status{font-size:13px;color:var(--muted);margin-top:10px;min-height:18px}
+.status.err{color:var(--rem)}
+.hidden{display:none!important}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar .sep{width:1px;height:24px;background:var(--line);margin:0 4px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-left:auto}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:5px;vertical-align:-2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}}
+.viewer{overflow:auto;background:#e9ebe7;border:1px solid var(--line);border-radius:8px;height:70vh;position:relative;touch-action:pan-x pan-y}
+.viewer canvas{display:block;background:#fff;margin:0 auto;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.side .card{margin:0;max-height:70vh;overflow:auto}
+h3{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.clist{list-style:none;margin:0;padding:0}
+.clist li{padding:8px;border-radius:6px;cursor:pointer;display:flex;gap:8px;align-items:center;border:1px solid transparent}
+.clist li:hover{background:#f2f4f6}
+.clist li.sel{border-color:var(--mod);background:#fff6ea}
+.num{font:600 12px var(--mono);background:var(--mod);color:#fff;border-radius:4px;padding:1px 6px;min-width:26px;text-align:center}
+.pill{font:600 11px var(--mono);border-radius:4px;padding:1px 6px}
+.pill.r{background:#fde7e6;color:var(--rem)} .pill.a{background:#e3f5ea;color:var(--add)}
+.txt{font-family:var(--mono);font-size:12px;line-height:1.6}
+.txt div{padding:1px 6px;border-radius:3px;margin-bottom:2px;word-break:break-all}
+.txt .r{background:#fde7e6;color:#8f1d1a;text-decoration:line-through}
+.txt .a{background:#e3f5ea;color:#0d5c2a}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+/* PCF */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border-radius:20px;padding:6px 12px;border:1px solid var(--line);background:#fff;cursor:pointer;font:600 13px var(--sans);display:flex;gap:8px;align-items:center}
+.chip b{font-family:var(--mono)}
+.chip .dot{width:10px;height:10px;border-radius:50%}
+.chip.off{opacity:.4}
+.isoBox{height:62vh;border:1px solid var(--line);border-radius:8px;background:#fbfcfa;position:relative;overflow:hidden;touch-action:none}
+.isoBox svg{width:100%;height:100%;display:block;cursor:grab}
+.isoBox .ctl{position:absolute;right:8px;top:8px;display:flex;gap:4px}
+.isoBox .ctl button{padding:4px 10px}
+.north{position:absolute;left:10px;bottom:8px;font:600 11px var(--mono);color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid #eceeea;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);background:#fff}
+.tableWrap th{position:sticky;top:0;z-index:1}
+td.mono,.mono{font-family:var(--mono);font-size:12px}
+tr.sel td{background:#eef4fb}
+tbody tr{cursor:pointer}
+.badge{font:600 11px var(--mono);border-radius:4px;padding:2px 7px;color:#fff;white-space:nowrap}
+.b-added{background:var(--add)} .b-removed{background:var(--rem)} .b-modified{background:var(--mod)} .b-moved{background:var(--mov)} .b-unchanged{background:var(--same)}
+.det div{margin-bottom:2px}
+.det .from{color:var(--rem)} .det .to{color:var(--add)}
+.tableWrap{max-height:60vh;overflow:auto}
+.delta-pos{color:var(--add);font-weight:600} .delta-neg{color:var(--rem);font-weight:600}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
+@media (max-width:1100px){.grid2{grid-template-columns:1fr}}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-radius:3px;padding:0 4px;background:#f7f7f5}
+</style>
+</head>
+<body>
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed');</script>
+<header>
+  <h1>Iso Revision Compare <span>IFC ⇄ LATEST</span></h1>
+  <p>Load the issued isometric and the latest one from the model. Changes are highlighted.</p>
+</header>
+<main>
+  <div class="tabs">
+    <button class="tab on" data-tab="pdf">PDF drawings</button>
+    <button class="tab" data-tab="pcf">PCF data</button>
+  </div>
+
+  <!-- ================= PDF MODE ================= -->
+  <section id="tab-pdf">
+    <div class="card">
+      <div class="drops">
+        <label class="drop old" id="dropPdfOld">
+          <span class="tag">Old · Issued (IFC)</span>
+          <span class="title">Drop or tap to choose PDF</span>
+          <span class="fname">No file</span>
+          <input type="file" accept=".pdf,application/pdf">
+        </label>
+        <label class="drop new" id="dropPdfNew">
+          <span class="tag">New · Latest from model</span>
+          <span class="title">Drop or tap to choose PDF</span>
+          <span class="fname">No file</span>
+          <input type="file" accept=".pdf,application/pdf">
+        </label>
+      </div>
+      <div class="opts">
+        <div class="opt">Resolution
+          <select id="pdfRes"><option value="1800">Standard</option><option value="2600" selected>High</option><option value="3400">Very high</option></select>
+        </div>
+        <div class="opt">Tolerance
+          <select id="pdfTol"><option value="0">0 px (strict)</option><option value="1">1 px</option><option value="2" selected>2 px</option><option value="3">3 px</option><option value="5">5 px (loose)</option></select>
+        </div>
+        <label class="chk"><input type="checkbox" id="pdfAlign" checked> Auto-align sheets</label>
+        <label class="chk"><input type="checkbox" id="pdfGrey" checked> Show unchanged in grey</label>
+        <button class="primary" id="pdfGo" disabled>Compare</button>
+      </div>
+      <div class="status" id="pdfStatus"></div>
+    </div>
+
+    <div id="pdfResult" class="hidden">
+      <div class="card">
+        <div class="toolbar">
+          <button data-view="overlay" class="on">Overlay</button>
+          <button data-view="old">Old</button>
+          <button data-view="new">New</button>
+          <span class="sep"></span>
+          <label class="chk" style="padding:0"><input type="checkbox" id="pdfBoxes" checked> Change boxes</label>
+          <span class="sep"></span>
+          <button id="zOut">−</button><button id="zFit">Fit</button><button id="zIn">+</button>
+          <span class="sep"></span>
+          <span class="small muted">Page old</span><select id="pgOld"></select>
+          <span class="small muted">new</span><select id="pgNew"></select>
+          <span class="small muted" id="shiftInfo"></span>
+          <div class="legend">
+            <span><i style="background:var(--rem)"></i>Removed (only in old)</span>
+            <span><i style="background:var(--add)"></i>Added (only in new)</span>
+            <span><i style="background:#bbb"></i>Unchanged</span>
+          </div>
+        </div>
+        <div class="layout">
+          <div class="viewer" id="viewer"><canvas id="pdfCanvas"></canvas></div>
+          <div class="side">
+            <div class="card">
+              <h3>Change areas <span id="clCount" class="muted"></span></h3>
+              <ul class="clist" id="clList"></ul>
+            </div>
+            <div class="card">
+              <h3>Text changes</h3>
+              <div class="note" style="margin-bottom:8px">Text that appears in only one sheet (BOM lines, dimensions, notes). A scanned PDF has no text layer, so this list stays empty.</div>
+              <div class="txt" id="txtDiff"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PCF MODE ================= -->
+  <section id="tab-pcf" class="hidden">
+    <div class="card">
+      <div class="drops">
+        <label class="drop old" id="dropPcfOld">
+          <span class="tag">Old · Issued (IFC)</span>
+          <span class="title">Drop or tap to choose PCF</span>
+          <span class="fname">No file</span>
+          <input type="file" accept=".pcf,.PCF,.txt">
+        </label>
+        <label class="drop new" id="dropPcfNew">
+          <span class="tag">New · Latest from model</span>
+          <span class="title">Drop or tap to choose PCF</span>
+          <span class="fname">No file</span>
+          <input type="file" accept=".pcf,.PCF,.txt">
+        </label>
+      </div>
+      <div class="opts">
+        <div class="opt">Point tolerance (coord units)
+          <input type="number" id="pcfTol" value="1" min="0.01" step="0.5" style="width:110px">
+        </div>
+        <div class="opt">Max move distance
+          <input type="number" id="pcfMove" value="500" min="0" step="50" style="width:110px">
+        </div>
+        <div class="opt">Ignore attributes (comma separated)
+          <input type="text" id="pcfIgnore" value="COMPONENT-IDENTIFIER, WELD-NUMBER" style="width:280px">
+        </div>
+        <button id="pcfSample">Load sample</button>
+        <button class="primary" id="pcfGo" disabled>Compare</button>
+      </div>
+      <div class="status" id="pcfStatus"></div>
+    </div>
+
+    <div id="pcfResult" class="hidden">
+      <div class="chips" id="chips"></div>
+      <div class="grid2">
+        <div class="card" style="margin:0">
+          <h3>Isometric view <span class="muted small" style="text-transform:none;letter-spacing:0">· drag to pan, scroll or buttons to zoom, tap a component</span></h3>
+          <div class="isoBox" id="isoBox">
+            <svg id="isoSvg"></svg>
+            <div class="ctl"><button id="isoOut">−</button><button id="isoFit">Fit</button><button id="isoIn">+</button></div>
+            <div class="north">▲ N is up-right · E down-right · EL up</div>
+          </div>
+        </div>
+        <div class="card" style="margin:0">
+          <h3>Header / line data</h3>
+          <div id="hdrDiff"></div>
+          <h3 style="margin-top:16px">Material summary <label class="chk" style="display:inline-flex;text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px"><input type="checkbox" id="bomAll"> show all</label></h3>
+          <div class="tableWrap" style="max-height:34vh" id="bomTable"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Component changes</h3>
+        <div class="tableWrap" id="chgTable"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= PCF CORE (pure logic) ======================= -->
+<script id="pcfCore">
+const GEO_KEYS = ['END-POINT','CENTRE-POINT','BRANCH1-POINT','BRANCH2-POINT','BRANCH3-POINT','CO-ORDS'];
+const KNOWN_COMP = new Set(['PIPE','PIPE-FIXED','ELBOW','ELBOW-REDUCING','BEND','TEE','TEE-STUB','TEE-SET-ON','TEE-REDUCING','CROSS','OLET','REDUCER-CONCENTRIC','REDUCER-ECCENTRIC',
+  'FLANGE','FLANGE-BLIND','FLANGE-REDUCING-CONCENTRIC','FLANGE-REDUCING-ECCENTRIC','VALVE','VALVE-ANGLE','VALVE-MULTIWAY','GASKET','BOLT','WELD','SUPPORT','CAP','COUPLING',
+  'UNION','INSTRUMENT','INSTRUMENT-ANGLE','INSTRUMENT-DIAL','INSTRUMENT-MULTIWAY','MISC-COMPONENT','FILTER','TRAP','LAPJOINT-STUBEND','LAPJOINT-RING','PIPE-BLOCK-FIXED','PIPE-BLOCK-VARIABLE','CLAMP','ADAPTER','SPECTACLE-BLIND','BLIND','SPACER']);
+const UCI_KEYS = ['UNIQUE-COMPONENT-IDENTIFIER','UCI'];
+
+function parsePCF(text){
+  const lines = text.split(/\r?\n/);
+  const blocks = []; const materials = {}; let cur = null; let inMat = false;
+  for (const raw of lines){
+    if (!raw.trim()) continue;
+    const indented = /^\s/.test(raw);
+    const t = raw.trim();
+    const sp = t.search(/\s/);
+    const key = (sp < 0 ? t : t.slice(0, sp)).toUpperCase();
+    const val = sp < 0 ? '' : t.slice(sp + 1).trim();
+    if (!indented){
+      if (key === 'MATERIALS'){ inMat = true; cur = null; continue; }
+      if (inMat){
+        if (key === 'ITEM-CODE'){ cur = {mat:true, code:val, desc:''}; materials[val] = cur; }
+        else cur = null;
+        continue;
+      }
+      cur = {key, val, attrs:[]}; blocks.push(cur);
+    } else {
+      if (!cur) continue;
+      if (cur.mat){ if (key === 'DESCRIPTION') cur.desc = cur.desc ? cur.desc + ' ' + val : val; continue; }
+      cur.attrs.push([key, val]);
+    }
+  }
+  const header = {}; const comps = [];
+  const addH = (k, v) => { let kk = k, n = 2; while (kk in header) kk = k + ' (' + (n++) + ')'; header[kk] = v; };
+  for (const b of blocks){
+    const hasGeo = b.attrs.some(a => GEO_KEYS.includes(a[0]));
+    if (hasGeo || KNOWN_COMP.has(b.key)) comps.push(makeComp(b, comps.length, materials));
+    else { addH(b.key, b.val); for (const [k, v] of b.attrs) addH(b.key + ' › ' + k, v); }
+  }
+  return {header, comps, materials, units: (header['UNITS-CO-ORDS'] || 'MM').toUpperCase()};
+}
+
+function makeComp(b, idx, materials){
+  const c = {idx, type:b.key, ends:[], centre:null, branches:[], coords:null, pts:[], attrs:{}, bores:[]};
+  const add = (k, v) => { c.attrs[k] = (k in c.attrs) ? c.attrs[k] + ' | ' + v : v; };
+  for (const [k, v] of b.attrs){
+    if (GEO_KEYS.includes(k)){
+      const n = v.split(/\s+/).map(parseFloat);
+      const p = [n[0], n[1], n[2]];
+      if (p.some(isNaN)){ add(k, v); continue; }
+      if (k === 'END-POINT') c.ends.push(p);
+      else if (k === 'CENTRE-POINT') c.centre = p;
+      else if (k.startsWith('BRANCH')) c.branches.push(p);
+      else if (k === 'CO-ORDS') c.coords = p;
+      if (!isNaN(n[3])) c.bores.push(n[3]);
+      c.pts.push(p);
+    } else add(k, v);
+  }
+  if (c.bores.length) c.attrs['BORE'] = c.bores.map(fmt).join(' × ');
+  const code = c.attrs['ITEM-CODE'];
+  c.code = code || '';
+  c.desc = c.attrs['ITEM-DESCRIPTION'] || c.attrs['DESCRIPTION'] || (code && materials[code] ? materials[code].desc : '');
+  c.skey = c.attrs['SKEY'] || '';
+  if (c.type.startsWith('PIPE') && c.ends.length >= 2) c.length = dist(c.ends[0], c.ends[1]);
+  c.centroid = c.pts.length ? c.pts.reduce((a, p) => [a[0]+p[0]/c.pts.length, a[1]+p[1]/c.pts.length, a[2]+p[2]/c.pts.length], [0,0,0]) : null;
+  return c;
+}
+
+function fmt(v){ if (v == null || isNaN(v)) return '–'; const r = Math.round(v * 10) / 10; return (Math.abs(r - Math.round(r)) < 1e-9 ? Math.round(r) : r.toFixed(1)).toString(); }
+function dist(a, b){ return Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]); }
+function loc(p){ return p ? `E ${fmt(p[0])}  N ${fmt(p[1])}  EL ${fmt(p[2])}` : ''; }
+
+function sharedPoints(a, b, tol){
+  const used = new Set(); let n = 0;
+  for (const p of a.pts){
+    for (let j = 0; j < b.pts.length; j++){
+      if (used.has(j)) continue;
+      if (dist(p, b.pts[j]) <= tol){ used.add(j); n++; break; }
+    }
+  }
+  return n;
+}
+function samePoints(a, b, tol){ return a.pts.length === b.pts.length && sharedPoints(a, b, tol) === a.pts.length; }
+
+function attrSig(c, ignore){
+  return c.type + '|' + Object.keys(c.attrs).filter(k => !ignore.has(k)).sort().map(k => k + '=' + c.attrs[k]).join(';');
+}
+
+function diffPair(a, b, tol, ignore){
+  const det = [];
+  const typeChanged = a.type !== b.type;
+  if (typeChanged) det.push({k:'TYPE', from:a.type, to:b.type});
+  let geo = 'same';
+  if (!samePoints(a, b, tol)){
+    // pure translation?
+    let tr = null;
+    if (a.pts.length === b.pts.length && a.pts.length){
+      const d = [b.pts[0][0]-a.pts[0][0], b.pts[0][1]-a.pts[0][1], b.pts[0][2]-a.pts[0][2]];
+      if (a.pts.every((p, i) => dist([p[0]+d[0], p[1]+d[1], p[2]+d[2]], b.pts[i]) <= tol)) tr = d;
+    }
+    if (tr){ geo = 'moved'; det.push({k:'MOVED BY', from:'', to:`ΔE ${fmt(tr[0])}  ΔN ${fmt(tr[1])}  ΔEL ${fmt(tr[2])}`}); }
+    else {
+      geo = 'changed';
+      if (a.length != null && b.length != null && Math.abs(a.length - b.length) > tol) det.push({k:'LENGTH', from:fmt(a.length), to:fmt(b.length)});
+      else det.push({k:'GEOMETRY', from:loc(a.pts[0]), to:loc(b.pts[0])});
+    }
+  }
+  const keys = new Set([...Object.keys(a.attrs), ...Object.keys(b.attrs)]);
+  let attrChanged = false;
+  for (const k of [...keys].sort()){
+    if (ignore.has(k)) continue;
+    const va = a.attrs[k], vb = b.attrs[k];
+    if ((va || '') !== (vb || '')){ attrChanged = true; det.push({k, from: va == null ? '(none)' : va, to: vb == null ? '(none)' : vb}); }
+  }
+  let status;
+  if (!typeChanged && geo === 'same' && !attrChanged) status = 'unchanged';
+  else if (!typeChanged && geo === 'moved' && !attrChanged) status = 'moved';
+  else status = 'modified';
+  return {status, det};
+}
+
+function comparePCF(A, B, opt){
+  const tol = Math.max(1e-6, +opt.tol || 1), mv = +opt.move || 0;
+  const ignore = new Set((opt.ignore || []).map(s => s.trim().toUpperCase()).filter(Boolean));
+  const usedA = new Set(), usedB = new Set(); const pairs = [];
+  const pair = (a, b, via) => { usedA.add(a.idx); usedB.add(b.idx); pairs.push({a, b, via, ...diffPair(a, b, tol, ignore)}); };
+  const freeA = () => A.comps.filter(c => !usedA.has(c.idx));
+  const freeB = () => B.comps.filter(c => !usedB.has(c.idx));
+
+  // 0. unique component id (if the PCF carries one)
+  const uci = c => { for (const k of UCI_KEYS) if (c.attrs[k]) return c.attrs[k]; return null; };
+  const byU = new Map(); for (const b of B.comps){ const u = uci(b); if (u) byU.set(u, b); }
+  for (const a of A.comps){ const u = uci(a); if (u && byU.has(u) && !usedB.has(byU.get(u).idx)) pair(a, byU.get(u), 'id'); }
+
+  // 1. identical geometry (or identical attributes for components with no geometry)
+  const q = v => Math.round(v / tol);
+  const gk = c => c.pts.length ? c.type + '|' + c.pts.map(p => p.map(q).join(',')).sort().join(';') : 'NG|' + attrSig(c, ignore);
+  const mapB = new Map();
+  for (const b of freeB()){ const k = gk(b); if (!mapB.has(k)) mapB.set(k, []); mapB.get(k).push(b); }
+  for (const a of freeA()){ const l = mapB.get(gk(a)); if (l && l.length) pair(a, l.shift(), 'geometry'); }
+  // 1b. same as 1 but tolerant to rounding
+  for (const a of freeA()){
+    if (!a.pts.length) continue;
+    const b = freeB().find(b => b.type === a.type && samePoints(a, b, tol));
+    if (b) pair(a, b, 'geometry');
+  }
+  // 2. same type, sharing connection points
+  for (const a of freeA()){
+    if (!a.pts.length) continue;
+    let best = null, bestN = 0, bestD = Infinity;
+    for (const b of freeB()){
+      if (b.type !== a.type || !b.pts.length) continue;
+      const n = sharedPoints(a, b, tol); if (!n) continue;
+      const d = dist(a.centroid, b.centroid);
+      if (n > bestN || (n === bestN && d < bestD)){ best = b; bestN = n; bestD = d; }
+    }
+    if (best) pair(a, best, 'connection');
+  }
+  // 3. same position, different component type (replaced)
+  for (const a of freeA()){
+    if (!a.pts.length) continue;
+    const b = freeB().find(b => b.pts.length && samePoints(a, b, tol));
+    if (b) pair(a, b, 'position');
+  }
+  // 4. same type, nearest within move distance
+  if (mv > 0){
+    const cands = [];
+    for (const a of freeA()) for (const b of freeB()){
+      if (a.type !== b.type || !a.centroid || !b.centroid) continue;
+      const d = dist(a.centroid, b.centroid); if (d <= mv) cands.push([d, a, b]);
+    }
+    cands.sort((x, y) => x[0] - y[0]);
+    for (const [, a, b] of cands) if (!usedA.has(a.idx) && !usedB.has(b.idx)) pair(a, b, 'nearest');
+  }
+  // 5. components without geometry: same type + item code
+  for (const a of freeA()){
+    if (a.pts.length) continue;
+    const b = freeB().find(b => !b.pts.length && b.type === a.type && b.code === a.code);
+    if (b) pair(a, b, 'item code');
+  }
+  const rows = [];
+  for (const p of pairs) rows.push({status:p.status, a:p.a, b:p.b, det:p.det, via:p.via});
+  for (const a of freeA()) rows.push({status:'removed', a, b:null, det:[]});
+  for (const b of freeB()) rows.push({status:'added', a:null, b, det:[]});
+  // order by position in new file, removed ones next to where they were
+  rows.forEach(r => r.order = r.b ? r.b.idx : (r.a.idx - 0.5));
+  rows.sort((x, y) => x.order - y.order);
+
+  // header
+  const hk = new Set([...Object.keys(A.header), ...Object.keys(B.header)]);
+  const header = [];
+  for (const k of hk){ const va = A.header[k], vb = B.header[k]; header.push({k, from:va, to:vb, changed:(va || '') !== (vb || '')}); }
+
+  // material summary
+  const bom = new Map();
+  const gkey = c => c.code || (c.type + (c.skey ? ' ' + c.skey : '') + (c.attrs['BORE'] ? ' ' + c.attrs['BORE'] : ''));
+  const addB = (c, side) => {
+    if (c.type === 'WELD') return;
+    const k = gkey(c);
+    if (!bom.has(k)) bom.set(k, {key:k, type:c.type, desc:c.desc, qa:0, qb:0, la:0, lb:0, pipe:false});
+    const r = bom.get(k); if (!r.desc && c.desc) r.desc = c.desc;
+    if (c.length != null){ r.pipe = true; r[side === 'a' ? 'la' : 'lb'] += c.length; }
+    else r[side === 'a' ? 'qa' : 'qb'] += 1;
+  };
+  A.comps.forEach(c => addB(c, 'a')); B.comps.forEach(c => addB(c, 'b'));
+  const bomRows = [...bom.values()].map(r => ({...r, changed: r.pipe ? Math.abs(r.la - r.lb) > tol : r.qa !== r.qb}));
+
+  const counts = {added:0, removed:0, modified:0, moved:0, unchanged:0};
+  rows.forEach(r => counts[r.status]++);
+  return {rows, header, bomRows, counts, units:B.units};
+}
+
+const SAMPLE_OLD = `ISOGEN-FILES ISOGEN.FLS
+UNITS-BORE MM
+UNITS-CO-ORDS MM
+UNITS-WEIGHT KGS
+PIPELINE-REFERENCE 430-SL-1001-150-J1A
+    PROJECT-IDENTIFIER SAMPLE-SRU
+    PIPING-SPEC J1A
+    REVISION 0
+PIPE
+    END-POINT 0.0 0.0 1000.0 150
+    END-POINT 2000.0 0.0 1000.0 150
+    ITEM-CODE P150-J1A
+    FABRICATION-ITEM
+ELBOW
+    END-POINT 2000.0 0.0 1000.0 150
+    END-POINT 2228.6 0.0 1228.6 150
+    CENTRE-POINT 2228.6 0.0 1000.0
+    SKEY ELBW
+    ITEM-CODE E90LR-150-J1A
+PIPE
+    END-POINT 2228.6 0.0 1228.6 150
+    END-POINT 2228.6 0.0 2771.4 150
+    ITEM-CODE P150-J1A
+ELBOW
+    END-POINT 2228.6 0.0 2771.4 150
+    END-POINT 2228.6 228.6 3000.0 150
+    CENTRE-POINT 2228.6 0.0 3000.0
+    SKEY ELBW
+    ITEM-CODE E90LR-150-J1A
+PIPE
+    END-POINT 2228.6 228.6 3000.0 150
+    END-POINT 2228.6 1500.0 3000.0 150
+    ITEM-CODE P150-J1A
+FLANGE
+    END-POINT 2228.6 1500.0 3000.0 150
+    END-POINT 2228.6 1600.0 3000.0 150
+    SKEY FLWN
+    ITEM-CODE FWN-150-300-J1A
+GASKET
+    END-POINT 2228.6 1600.0 3000.0 150
+    END-POINT 2228.6 1603.0 3000.0 150
+    ITEM-CODE GSW-150-300
+VALVE
+    END-POINT 2228.6 1603.0 3000.0 150
+    END-POINT 2228.6 2003.0 3000.0 150
+    SKEY VVFL
+    ITEM-CODE VGA-150-300-J1A
+GASKET
+    END-POINT 2228.6 2003.0 3000.0 150
+    END-POINT 2228.6 2006.0 3000.0 150
+    ITEM-CODE GSW-150-300
+FLANGE
+    END-POINT 2228.6 2006.0 3000.0 150
+    END-POINT 2228.6 2106.0 3000.0 150
+    SKEY FLWN
+    ITEM-CODE FWN-150-300-J1A
+PIPE
+    END-POINT 2228.6 2106.0 3000.0 150
+    END-POINT 2228.6 3500.0 3000.0 150
+    ITEM-CODE P150-J1A
+SUPPORT
+    CO-ORDS 1000.0 0.0 920.0 150
+    SKEY 01HG
+    NAME PS-1001
+SUPPORT
+    CO-ORDS 2228.6 2800.0 2920.0 150
+    SKEY 01HG
+    NAME PS-1002
+MATERIALS
+ITEM-CODE P150-J1A
+    DESCRIPTION PIPE 6" SCH40 SMLS A106-B
+ITEM-CODE E90LR-150-J1A
+    DESCRIPTION ELBOW 90 LR 6" SCH40 A234-WPB
+ITEM-CODE FWN-150-300-J1A
+    DESCRIPTION FLANGE WN 6" 300# RF A105
+ITEM-CODE GSW-150-300
+    DESCRIPTION GASKET SPW 6" 300#
+ITEM-CODE VGA-150-300-J1A
+    DESCRIPTION GATE VALVE 6" 300# RF
+`;
+const SAMPLE_NEW = `ISOGEN-FILES ISOGEN.FLS
+UNITS-BORE MM
+UNITS-CO-ORDS MM
+UNITS-WEIGHT KGS
+PIPELINE-REFERENCE 430-SL-1001-150-J1A
+    PROJECT-IDENTIFIER SAMPLE-SRU
+    PIPING-SPEC J1A
+    REVISION 1
+PIPE
+    END-POINT 0.0 0.0 1000.0 150
+    END-POINT 800.0 0.0 1000.0 150
+    ITEM-CODE P150-J1A
+    FABRICATION-ITEM
+TEE
+    END-POINT 800.0 0.0 1000.0 150
+    END-POINT 1100.0 0.0 1000.0 150
+    CENTRE-POINT 950.0 0.0 1000.0
+    BRANCH1-POINT 950.0 0.0 1150.0 50
+    SKEY TERF
+    ITEM-CODE TR-150x50-J1A
+PIPE
+    END-POINT 950.0 0.0 1150.0 50
+    END-POINT 950.0 0.0 1700.0 50
+    ITEM-CODE P50-J1A
+CAP
+    END-POINT 950.0 0.0 1700.0 50
+    ITEM-CODE CAP-50-J1A
+PIPE
+    END-POINT 1100.0 0.0 1000.0 150
+    END-POINT 2000.0 0.0 1000.0 150
+    ITEM-CODE P150-J1A
+ELBOW
+    END-POINT 2000.0 0.0 1000.0 150
+    END-POINT 2228.6 0.0 1228.6 150
+    CENTRE-POINT 2228.6 0.0 1000.0
+    SKEY ELBW
+    ITEM-CODE E90LR-150-J1A
+PIPE
+    END-POINT 2228.6 0.0 1228.6 150
+    END-POINT 2228.6 0.0 2771.4 150
+    ITEM-CODE P150-J1A
+ELBOW
+    END-POINT 2228.6 0.0 2771.4 150
+    END-POINT 2228.6 228.6 3000.0 150
+    CENTRE-POINT 2228.6 0.0 3000.0
+    SKEY ELBW
+    ITEM-CODE E90LR-150-J1A
+PIPE
+    END-POINT 2228.6 228.6 3000.0 150
+    END-POINT 2228.6 1500.0 3000.0 150
+    ITEM-CODE P150-J1A
+FLANGE
+    END-POINT 2228.6 1500.0 3000.0 150
+    END-POINT 2228.6 1600.0 3000.0 150
+    SKEY FLWN
+    ITEM-CODE FWN-150-300-J1A
+GASKET
+    END-POINT 2228.6 1600.0 3000.0 150
+    END-POINT 2228.6 1603.0 3000.0 150
+    ITEM-CODE GSW-150-300
+VALVE
+    END-POINT 2228.6 1603.0 3000.0 150
+    END-POINT 2228.6 2003.0 3000.0 150
+    SKEY VGFL
+    ITEM-CODE VGL-150-300-J1A
+GASKET
+    END-POINT 2228.6 2003.0 3000.0 150
+    END-POINT 2228.6 2006.0 3000.0 150
+    ITEM-CODE GSW-150-300
+FLANGE
+    END-POINT 2228.6 2006.0 3000.0 150
+    END-POINT 2228.6 2106.0 3000.0 150
+    SKEY FLWN
+    ITEM-CODE FWN-150-300-J1A
+PIPE
+    END-POINT 2228.6 2106.0 3000.0 150
+    END-POINT 2228.6 3200.0 3000.0 150
+    ITEM-CODE P150-J1A
+SUPPORT
+    CO-ORDS 1400.0 0.0 920.0 150
+    SKEY 01HG
+    NAME PS-1001
+SUPPORT
+    CO-ORDS 2228.6 2800.0 2920.0 150
+    SKEY 01HG
+    NAME PS-1002
+MATERIALS
+ITEM-CODE P150-J1A
+    DESCRIPTION PIPE 6" SCH40 SMLS A106-B
+ITEM-CODE P50-J1A
+    DESCRIPTION PIPE 2" SCH80 SMLS A106-B
+ITEM-CODE E90LR-150-J1A
+    DESCRIPTION ELBOW 90 LR 6" SCH40 A234-WPB
+ITEM-CODE TR-150x50-J1A
+    DESCRIPTION TEE RED 6"x2" SCH40 A234-WPB
+ITEM-CODE CAP-50-J1A
+    DESCRIPTION CAP 2" SCH80 A234-WPB
+ITEM-CODE FWN-150-300-J1A
+    DESCRIPTION FLANGE WN 6" 300# RF A105
+ITEM-CODE GSW-150-300
+    DESCRIPTION GASKET SPW 6" 300#
+ITEM-CODE VGL-150-300-J1A
+    DESCRIPTION GLOBE VALVE 6" 300# RF
+`;
+if (typeof module !== 'undefined') module.exports = {parsePCF, comparePCF, SAMPLE_OLD, SAMPLE_NEW};
+</script>
+
+<!-- ======================= UI ======================= -->
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- tabs ---------- */
+$$('.tab').forEach(t => t.onclick = () => {
+  $$('.tab').forEach(x => x.classList.toggle('on', x === t));
+  $('#tab-pdf').classList.toggle('hidden', t.dataset.tab !== 'pdf');
+  $('#tab-pcf').classList.toggle('hidden', t.dataset.tab !== 'pcf');
+  try { localStorage.setItem('isoCmpTab', t.dataset.tab); } catch (e) {}
+});
+try { const t = localStorage.getItem('isoCmpTab'); if (t === 'pcf') $('.tab[data-tab=pcf]').click(); } catch (e) {}
+
+/* ---------- drop zones ---------- */
+function setupDrop(el, exts, onFile){
+  const inp = el.querySelector('input');
+  const take = f => {
+    if (!f) return;
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    if (!exts.includes(ext)){
+      el.querySelector('.fname').textContent = `“${f.name}” is not a ${exts.map(e => '.' + e).join(' / ')} file`;
+      el.querySelector('.fname').style.color = 'var(--rem)'; return;
+    }
+    el.querySelector('.fname').style.color = '';
+    el.querySelector('.fname').textContent = f.name + '  ·  ' + (f.size / 1024).toFixed(0) + ' KB';
+    el.classList.add('has'); onFile(f);
+  };
+  inp.onchange = () => take(inp.files[0]);
+  el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('over'));
+  el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('over'); take(e.dataTransfer.files[0]); });
+}
+
+/* =====================================================================
+   PDF MODE
+   ===================================================================== */
+const P = {fOld:null, fNew:null, dOld:null, dNew:null, W:0, H:0, cOld:null, cNew:null, cRes:null, shift:[0,0], clusters:[], view:'overlay', zoom:1, sel:-1};
+const pdfStatus = (m, err) => { const s = $('#pdfStatus'); s.textContent = m; s.classList.toggle('err', !!err); };
+setupDrop($('#dropPdfOld'), ['pdf'], f => { P.fOld = f; P.dOld = null; $('#pdfGo').disabled = !(P.fOld && P.fNew); });
+setupDrop($('#dropPdfNew'), ['pdf'], f => { P.fNew = f; P.dNew = null; $('#pdfGo').disabled = !(P.fOld && P.fNew); });
+
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const tick = () => new Promise(r => setTimeout(r, 0));
+
+async function openPdf(f){ return pdfjsLib.getDocument({data: new Uint8Array(await f.arrayBuffer())}).promise; }
+
+async function renderPage(doc, n, W){
+  const page = await doc.getPage(n);
+  const v1 = page.getViewport({scale:1});
+  const vp = page.getViewport({scale: W / v1.width});
+  const c = document.createElement('canvas');
+  c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+  const ctx = c.getContext('2d', {willReadFrequently:true});
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({canvasContext:ctx, viewport:vp}).promise;
+  let text = [];
+  try { const tc = await page.getTextContent(); text = tc.items.map(i => (i.str || '').replace(/\s+/g, ' ').trim()).filter(Boolean); } catch (e) {}
+  return {canvas:c, text};
+}
+
+function inkMask(canvas, W, H){
+  const m = new Uint8Array(W * H);
+  const w = Math.min(W, canvas.width), h = Math.min(H, canvas.height);
+  const d = canvas.getContext('2d', {willReadFrequently:true}).getImageData(0, 0, w, h).data;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){
+    const i = (y * w + x) * 4;
+    if (0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2] < 175) m[y * W + x] = 1;
+  }
+  return m;
+}
+function dilate(m, W, H, r){
+  if (r <= 0) return m;
+  const t = new Uint8Array(W * H), o = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++){
+    const row = y * W; let c = 0;
+    for (let x = 0; x < Math.min(r, W); x++) c += m[row + x];
+    for (let x = 0; x < W; x++){
+      if (x + r < W) c += m[row + x + r];
+      if (x - r - 1 >= 0) c -= m[row + x - r - 1];
+      t[row + x] = c > 0 ? 1 : 0;
+    }
+  }
+  for (let x = 0; x < W; x++){
+    let c = 0;
+    for (let y = 0; y < Math.min(r, H); y++) c += t[y * W + x];
+    for (let y = 0; y < H; y++){
+      if (y + r < H) c += t[(y + r) * W + x];
+      if (y - r - 1 >= 0) c -= t[(y - r - 1) * W + x];
+      o[y * W + x] = c > 0 ? 1 : 0;
+    }
+  }
+  return o;
+}
+function down(m, W, H, f){
+  const w = Math.ceil(W / f), h = Math.ceil(H / f), o = new Uint8Array(w * h);
+  for (let y = 0; y < H; y++){ const r = y * W, rr = ((y / f) | 0) * w; for (let x = 0; x < W; x++) if (m[r + x]) o[rr + ((x / f) | 0)] = 1; }
+  return {m:o, w, h};
+}
+function overlap(o, n, w, h, dx, dy){
+  let s = 0;
+  const y0 = Math.max(0, dy), y1 = Math.min(h, h + dy), x0 = Math.max(0, dx), x1 = Math.min(w, w + dx);
+  for (let y = y0; y < y1; y++){ const ro = (y - dy) * w - dx, rn = y * w; for (let x = x0; x < x1; x++) s += o[ro + x] & n[rn + x]; }
+  return s;
+}
+function autoAlign(mo, mn, W, H){
+  let cx = 0, cy = 0;
+  const levels = [[8, 10], [4, 2], [2, 2], [1, 1]];
+  let first = true;
+  for (const [f, R] of levels){
+    if (!first){ cx *= 2; cy *= 2; }
+    const o = f === 1 ? {m:mo, w:W, h:H} : down(mo, W, H, f);
+    const n = f === 1 ? {m:mn} : down(mn, W, H, f);
+    let best = -1, bx = cx, by = cy;
+    for (let dy = cy - R; dy <= cy + R; dy++) for (let dx = cx - R; dx <= cx + R; dx++){
+      const s = overlap(o.m, n.m, o.w, o.h, dx, dy);
+      if (s > best || (s === best && Math.abs(dx) + Math.abs(dy) < Math.abs(bx) + Math.abs(by))){ best = s; bx = dx; by = dy; }
+    }
+    cx = bx; cy = by; first = false;
+    // level transitions: f8 -> f4 -> f2 -> f1, each halves
+  }
+  return [cx, cy];
+}
+function shiftMask(m, W, H, dx, dy){
+  if (!dx && !dy) return m;
+  const o = new Uint8Array(W * H);
+  for (let y = Math.max(0, dy); y < Math.min(H, H + dy); y++){
+    const ro = (y - dy) * W - dx, rn = y * W;
+    for (let x = Math.max(0, dx); x < Math.min(W, W + dx); x++) o[rn + x] = m[ro + x];
+  }
+  return o;
+}
+function clusterChanges(rem, add, W, H){
+  const C = 14, gw = Math.ceil(W / C), gh = Math.ceil(H / C);
+  const cr = new Uint32Array(gw * gh), ca = new Uint32Array(gw * gh);
+  for (let y = 0; y < H; y++){ const r = y * W, gr = ((y / C) | 0) * gw; for (let x = 0; x < W; x++){ const i = r + x; if (rem[i]) cr[gr + ((x / C) | 0)]++; else if (add[i]) ca[gr + ((x / C) | 0)]++; } }
+  const act = i => cr[i] + ca[i] >= 3;
+  const seen = new Uint8Array(gw * gh), out = [], G = 2;
+  for (let s = 0; s < gw * gh; s++){
+    if (seen[s] || !act(s)) continue;
+    const st = [s]; seen[s] = 1;
+    let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1, nr = 0, na = 0;
+    while (st.length){
+      const i = st.pop(), gx = i % gw, gy = (i / gw) | 0;
+      x0 = Math.min(x0, gx); x1 = Math.max(x1, gx); y0 = Math.min(y0, gy); y1 = Math.max(y1, gy);
+      nr += cr[i]; na += ca[i];
+      for (let yy = Math.max(0, gy - G); yy <= Math.min(gh - 1, gy + G); yy++)
+        for (let xx = Math.max(0, gx - G); xx <= Math.min(gw - 1, gx + G); xx++){
+          const j = yy * gw + xx; if (!seen[j] && act(j)){ seen[j] = 1; st.push(j); }
+        }
+    }
+    if (nr + na < 25) continue;
+    out.push({x:x0 * C, y:y0 * C, w:(x1 - x0 + 1) * C, h:(y1 - y0 + 1) * C, nr, na});
+  }
+  const band = H / 12;
+  out.sort((a, b) => (Math.floor(a.y / band) - Math.floor(b.y / band)) || (a.x - b.x));
+  return out;
+}
+
+async function runPdf(){
+  try {
+    $('#pdfGo').disabled = true;
+    if (!window.pdfjsLib) throw new Error('The PDF library could not load. Check your internet connection and reload.');
+    pdfStatus('Reading PDFs…'); await tick();
+    if (!P.dOld) P.dOld = await openPdf(P.fOld);
+    if (!P.dNew) P.dNew = await openPdf(P.fNew);
+    fillPages($('#pgOld'), P.dOld.numPages); fillPages($('#pgNew'), P.dNew.numPages);
+    await comparePages();
+  } catch (e) {
+    console.error(e); pdfStatus('Could not compare: ' + (e.message || e), true);
+  } finally { $('#pdfGo').disabled = !(P.fOld && P.fNew); }
+}
+function fillPages(sel, n){
+  const cur = +sel.value || 1; sel.innerHTML = '';
+  for (let i = 1; i <= n; i++){ const o = document.createElement('option'); o.value = i; o.textContent = i + ' / ' + n; sel.appendChild(o); }
+  sel.value = Math.min(cur, n);
+}
+async function comparePages(){
+  const W0 = +$('#pdfRes').value, tol = +$('#pdfTol').value;
+  pdfStatus('Rendering sheets…'); await tick();
+  const rn = await renderPage(P.dNew, +$('#pgNew').value || 1, W0);
+  const ro = await renderPage(P.dOld, +$('#pgOld').value || 1, W0);
+  const W = rn.canvas.width, H = rn.canvas.height;
+  P.W = W; P.H = H; P.cOld = ro.canvas; P.cNew = rn.canvas;
+  pdfStatus('Comparing linework…'); await tick();
+  const mn = inkMask(rn.canvas, W, H);
+  let mo = inkMask(ro.canvas, W, H);
+  let sh = [0, 0];
+  if ($('#pdfAlign').checked){ sh = autoAlign(mo, mn, W, H); mo = shiftMask(mo, W, H, sh[0], sh[1]); }
+  P.shift = sh;
+  $('#shiftInfo').textContent = (sh[0] || sh[1]) ? `· old shifted ${sh[0]}, ${sh[1]} px` : '';
+  const dn = dilate(mn, W, H, tol), dO = dilate(mo, W, H, tol);
+  const rem = new Uint8Array(W * H), add = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++){ if (mo[i] && !dn[i]) rem[i] = 1; if (mn[i] && !dO[i]) add[i] = 1; }
+  // result image
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const ctx = c.getContext('2d'); const img = ctx.createImageData(W, H); const d = img.data;
+  const grey = $('#pdfGrey').checked;
+  for (let i = 0, j = 0; i < W * H; i++, j += 4){
+    let r = 255, g = 255, b = 255;
+    if (rem[i]){ r = 208; g = 49; b = 45; }
+    else if (add[i]){ r = 19; g = 137; b = 63; }
+    else if (grey && (mn[i] || mo[i])){ r = 180; g = 184; b = 188; }
+    d[j] = r; d[j+1] = g; d[j+2] = b; d[j+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  P.cRes = c;
+  // thicken coloured strokes slightly so thin changes stay visible when zoomed out
+  P.clusters = clusterChanges(rem, add, W, H);
+  P.sel = -1;
+  // text
+  const td = multisetDiff(ro.text, rn.text);
+  renderTextDiff(td);
+  renderClusterList();
+  $('#pdfResult').classList.remove('hidden');
+  fitZoom(); draw();
+  const n = P.clusters.length;
+  pdfStatus(n ? `${n} change area${n > 1 ? 's' : ''} found. Tap one in the list to zoom to it.` : 'No linework differences found at this tolerance.');
+}
+function multisetDiff(a, b){
+  const m = new Map(); for (const s of a) m.set(s, (m.get(s) || 0) + 1);
+  const added = []; for (const s of b){ const c = m.get(s) || 0; if (c > 0) m.set(s, c - 1); else added.push(s); }
+  const removed = []; for (const [s, c] of m) for (let i = 0; i < c; i++) removed.push(s);
+  return {removed, added};
+}
+function renderTextDiff(td){
+  const el = $('#txtDiff');
+  if (!td.removed.length && !td.added.length){ el.innerHTML = '<div class="muted" style="text-decoration:none">No text differences.</div>'; return; }
+  const cap = 400; let h = '';
+  if (td.removed.length) h += `<div class="muted" style="font-family:var(--sans)">Only in old (${td.removed.length})</div>` + td.removed.slice(0, cap).map(s => `<div class="r">${esc(s)}</div>`).join('');
+  if (td.added.length) h += `<div class="muted" style="font-family:var(--sans);margin-top:8px">Only in new (${td.added.length})</div>` + td.added.slice(0, cap).map(s => `<div class="a">${esc(s)}</div>`).join('');
+  el.innerHTML = h;
+}
+function renderClusterList(){
+  const ul = $('#clList'); $('#clCount').textContent = '(' + P.clusters.length + ')';
+  if (!P.clusters.length){ ul.innerHTML = '<li class="muted">None</li>'; return; }
+  ul.innerHTML = P.clusters.map((c, i) => `<li data-i="${i}"><span class="num">${i + 1}</span>
+    ${c.nr ? `<span class="pill r">−${c.nr}</span>` : ''}${c.na ? `<span class="pill a">+${c.na}</span>` : ''}
+    <span class="small muted">${c.nr && c.na ? 'changed' : c.nr ? 'removed' : 'added'}</span></li>`).join('');
+  ul.querySelectorAll('li[data-i]').forEach(li => li.onclick = () => focusCluster(+li.dataset.i));
+}
+function draw(){
+  const cv = $('#pdfCanvas'); if (!P.cRes) return;
+  cv.width = P.W; cv.height = P.H;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, P.W, P.H);
+  if (P.view === 'overlay') ctx.drawImage(P.cRes, 0, 0);
+  else if (P.view === 'new') ctx.drawImage(P.cNew, 0, 0);
+  else ctx.drawImage(P.cOld, P.shift[0], P.shift[1]);
+  if ($('#pdfBoxes').checked){
+    const lw = Math.max(2, P.W / 900), pad = 10;
+    ctx.font = `600 ${Math.round(P.W / 110)}px IBM Plex Mono, monospace`;
+    P.clusters.forEach((c, i) => {
+      const sel = i === P.sel;
+      ctx.strokeStyle = sel ? '#1f4e79' : 'rgba(217,122,0,.95)'; ctx.lineWidth = sel ? lw * 2 : lw;
+      ctx.setLineDash(sel ? [] : [lw * 4, lw * 2.5]);
+      roundRect(ctx, c.x - pad, c.y - pad, c.w + pad * 2, c.h + pad * 2, lw * 4); ctx.stroke();
+      ctx.setLineDash([]);
+      const label = String(i + 1); const tw = ctx.measureText(label).width + lw * 6, th = P.W / 80;
+      ctx.fillStyle = sel ? '#1f4e79' : '#d97a00';
+      ctx.fillRect(c.x - pad, c.y - pad - th, tw, th);
+      ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText(label, c.x - pad + lw * 3, c.y - pad - th / 2);
+    });
+  }
+  applyZoom();
+}
+function roundRect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function applyZoom(){ const cv = $('#pdfCanvas'); cv.style.width = (P.W * P.zoom) + 'px'; cv.style.height = (P.H * P.zoom) + 'px'; }
+function fitZoom(){ const v = $('#viewer'); P.zoom = Math.min((v.clientWidth - 4) / P.W, (v.clientHeight - 4) / P.H); applyZoom(); }
+function zoomBy(f){
+  const v = $('#viewer'); const cx = (v.scrollLeft + v.clientWidth / 2) / P.zoom, cy = (v.scrollTop + v.clientHeight / 2) / P.zoom;
+  P.zoom = Math.max(0.05, Math.min(4, P.zoom * f)); applyZoom();
+  v.scrollLeft = cx * P.zoom - v.clientWidth / 2; v.scrollTop = cy * P.zoom - v.clientHeight / 2;
+}
+function focusCluster(i){
+  P.sel = i; const c = P.clusters[i]; const v = $('#viewer');
+  $$('#clList li').forEach(li => li.classList.toggle('sel', +li.dataset.i === i));
+  P.zoom = Math.max(0.15, Math.min(2, Math.min(v.clientWidth * 0.55 / (c.w + 40), v.clientHeight * 0.55 / (c.h + 40))));
+  draw();
+  v.scrollLeft = (c.x + c.w / 2) * P.zoom - v.clientWidth / 2;
+  v.scrollTop = (c.y + c.h / 2) * P.zoom - v.clientHeight / 2;
+  if (window.innerWidth < 1000) v.scrollIntoView({behavior:'smooth', block:'start'});
+}
+$('#pdfGo').onclick = runPdf;
+$$('[data-view]').forEach(b => b.onclick = () => { P.view = b.dataset.view; $$('[data-view]').forEach(x => x.classList.toggle('on', x === b)); draw(); });
+$('#pdfBoxes').onchange = draw;
+$('#zIn').onclick = () => zoomBy(1.4); $('#zOut').onclick = () => zoomBy(1 / 1.4); $('#zFit').onclick = fitZoom;
+$('#pgOld').onchange = $('#pgNew').onchange = () => comparePages().catch(e => pdfStatus('Could not compare: ' + e.message, true));
+$('#viewer').addEventListener('wheel', e => { if (e.ctrlKey || e.metaKey){ e.preventDefault(); zoomBy(e.deltaY < 0 ? 1.15 : 1 / 1.15); } }, {passive:false});
+// drag to pan the drawing (mouse)
+(() => { const v = $('#viewer'); let d = null;
+  v.addEventListener('mousedown', e => { d = {x:e.clientX, y:e.clientY, l:v.scrollLeft, t:v.scrollTop}; v.style.cursor = 'grabbing'; });
+  window.addEventListener('mousemove', e => { if (!d) return; v.scrollLeft = d.l - (e.clientX - d.x); v.scrollTop = d.t - (e.clientY - d.y); });
+  window.addEventListener('mouseup', () => { d = null; v.style.cursor = ''; });
+})();
+
+/* =====================================================================
+   PCF MODE
+   ===================================================================== */
+const Q = {tOld:null, tNew:null, nOld:'', nNew:'', res:null, show:{added:true, removed:true, modified:true, moved:true, unchanged:false}, sel:null, view:{s:1, tx:0, ty:0}};
+const pcfStatus = (m, err) => { const s = $('#pcfStatus'); s.textContent = m; s.classList.toggle('err', !!err); };
+const readText = f => f.text ? f.text() : new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f); });
+setupDrop($('#dropPcfOld'), ['pcf', 'txt'], async f => { Q.tOld = await readText(f); Q.nOld = f.name; $('#pcfGo').disabled = !(Q.tOld && Q.tNew); });
+setupDrop($('#dropPcfNew'), ['pcf', 'txt'], async f => { Q.tNew = await readText(f); Q.nNew = f.name; $('#pcfGo').disabled = !(Q.tOld && Q.tNew); });
+$('#pcfSample').onclick = () => {
+  Q.tOld = SAMPLE_OLD; Q.tNew = SAMPLE_NEW;
+  for (const [id, n] of [['#dropPcfOld', 'sample_rev0.pcf'], ['#dropPcfNew', 'sample_rev1.pcf']]){ const el = $(id); el.classList.add('has'); el.querySelector('.fname').textContent = n + '  ·  built-in sample'; el.querySelector('.fname').style.color = ''; }
+  $('#pcfGo').disabled = false; runPcf();
+};
+$('#pcfGo').onclick = runPcf;
+
+function runPcf(){
+  try {
+    const A = parsePCF(Q.tOld), B = parsePCF(Q.tNew);
+    if (!A.comps.length || !B.comps.length) throw new Error(`no components found in the ${!A.comps.length ? 'old' : 'new'} file. Is it a PCF?`);
+    Q.res = comparePCF(A, B, {tol:$('#pcfTol').value, move:$('#pcfMove').value, ignore:$('#pcfIgnore').value.split(',')});
+    Q.sel = null;
+    const c = Q.res.counts, chg = c.added + c.removed + c.modified + c.moved;
+    pcfStatus(`${A.comps.length} components in old, ${B.comps.length} in new · ${chg} change${chg === 1 ? '' : 's'} · units ${Q.res.units}`);
+    $('#pcfResult').classList.remove('hidden');
+    renderChips(); renderHeader(); renderBom(); renderTable(); fitIso();
+  } catch (e) { console.error(e); pcfStatus('Could not compare: ' + (e.message || e), true); }
+}
+const ST = {added:['Added','var(--add)'], removed:['Removed','var(--rem)'], modified:['Modified','var(--mod)'], moved:['Moved','var(--mov)'], unchanged:['Unchanged','var(--same)']};
+function renderChips(){
+  const c = Q.res.counts;
+  $('#chips').innerHTML = Object.keys(ST).map(k => `<button class="chip ${Q.show[k] ? '' : 'off'}" data-k="${k}"><span class="dot" style="background:${ST[k][1]}"></span>${ST[k][0]} <b>${c[k]}</b></button>`).join('');
+  $$('#chips .chip').forEach(b => b.onclick = () => { Q.show[b.dataset.k] = !Q.show[b.dataset.k]; renderChips(); renderTable(); drawIso(); });
+}
+function renderHeader(){
+  const ch = Q.res.header.filter(h => h.changed);
+  const keyRows = Q.res.header.filter(h => /PIPELINE-REFERENCE$|REVISION|PIPING-SPEC/.test(h.k) && !h.changed);
+  let h = '<table><thead><tr><th>Attribute</th><th>Old</th><th>New</th></tr></thead><tbody>';
+  for (const r of ch) h += `<tr><td class="mono">${esc(r.k)}</td><td class="mono" style="color:var(--rem)">${esc(r.from ?? '(none)')}</td><td class="mono" style="color:var(--add)">${esc(r.to ?? '(none)')}</td></tr>`;
+  for (const r of keyRows) h += `<tr><td class="mono">${esc(r.k)}</td><td class="mono muted" colspan="2">${esc(r.to)}</td></tr>`;
+  h += '</tbody></table>';
+  if (!ch.length) h = '<div class="note" style="margin-bottom:6px">No header changes.</div>' + h;
+  $('#hdrDiff').innerHTML = h;
+}
+function renderBom(){
+  const all = $('#bomAll').checked; const mm = Q.res.units.startsWith('MM');
+  const rows = Q.res.bomRows.filter(r => all || r.changed).sort((a, b) => (b.changed - a.changed) || a.key.localeCompare(b.key));
+  if (!rows.length){ $('#bomTable').innerHTML = '<div class="note">No quantity changes.</div>'; return; }
+  const q = (r, s) => r.pipe ? (mm ? (r[s] / 1000).toFixed(2) + ' m' : fmt(r[s])) : r[s === 'la' ? 'qa' : 'qb'];
+  const dlt = r => { const d = r.pipe ? (r.lb - r.la) : (r.qb - r.qa); if (Math.abs(d) < 1e-9) return '<span class="muted">0</span>'; const t = r.pipe ? (mm ? (d / 1000).toFixed(2) + ' m' : fmt(d)) : d; return `<span class="${d > 0 ? 'delta-pos' : 'delta-neg'}">${d > 0 ? '+' : ''}${t}</span>`; };
+  $('#bomTable').innerHTML = '<table><thead><tr><th>Item</th><th>Old</th><th>New</th><th>Δ</th></tr></thead><tbody>' +
+    rows.map(r => `<tr style="cursor:default"><td><div class="mono">${esc(r.key)}</div><div class="small muted">${esc(r.desc || r.type)}</div></td><td class="mono">${q(r, 'la')}</td><td class="mono">${q(r, 'lb')}</td><td class="mono">${dlt(r)}</td></tr>`).join('') + '</tbody></table>';
+}
+$('#bomAll').onchange = renderBom;
+
+function compLabel(c){ return c.type + (c.skey ? ' · ' + c.skey : ''); }
+function renderTable(){
+  const rows = Q.res.rows.map((r, i) => ({...r, i})).filter(r => Q.show[r.status]);
+  if (!rows.length){ $('#chgTable').innerHTML = '<div class="empty">Nothing to show. Turn on a category above.</div>'; return; }
+  let h = '<table><thead><tr><th>#</th><th>Status</th><th>Component</th><th>Item</th><th>Location</th><th>Details</th></tr></thead><tbody>';
+  for (const r of rows){
+    const c = r.b || r.a; const p = c.centroid || c.pts[0];
+    let det = '';
+    if (r.status === 'added') det = '<span class="muted">New in latest isometric</span>';
+    else if (r.status === 'removed') det = '<span class="muted">Not in latest isometric</span>';
+    else if (r.status === 'unchanged') det = '<span class="muted">—</span>';
+    else det = r.det.map(d => d.k === 'MOVED BY' ? `<div><b class="mono">${esc(d.k)}</b> ${esc(d.to)}</div>` :
+      `<div><b class="mono">${esc(d.k)}</b>: <span class="from mono">${esc(d.from)}</span> → <span class="to mono">${esc(d.to)}</span></div>`).join('');
+    h += `<tr data-i="${r.i}" class="${Q.sel === r.i ? 'sel' : ''}"><td class="mono muted">${r.i + 1}</td><td><span class="badge b-${r.status}">${r.status.toUpperCase()}</span></td>
+      <td class="mono">${esc(compLabel(c))}${r.a && r.b && r.a.type !== r.b.type ? `<div class="small muted">was ${esc(r.a.type)}</div>` : ''}</td>
+      <td><div class="mono">${esc(c.code)}</div><div class="small muted">${esc(c.desc)}</div></td>
+      <td class="mono small">${p ? esc(loc(p)) : '<span class="muted">–</span>'}</td><td class="det small">${det}</td></tr>`;
+  }
+  $('#chgTable').innerHTML = h + '</tbody></table>';
+  $$('#chgTable tbody tr').forEach(tr => tr.onclick = () => selectRow(+tr.dataset.i, true));
+}
+function selectRow(i, center){
+  Q.sel = i;
+  $$('#chgTable tbody tr').forEach(tr => tr.classList.toggle('sel', +tr.dataset.i === i));
+  if (center){
+    const r = Q.res.rows[i]; const c = r.b || r.a;
+    if (c.centroid){ const box = $('#isoBox'); const [sx, sy] = proj(c.centroid);
+      const v = Q.view; v.s = Math.max(v.s, fitScale() * 3);
+      v.tx = box.clientWidth / 2 - sx * v.s; v.ty = box.clientHeight / 2 - sy * v.s; }
+    if (window.innerWidth < 1100) $('#isoBox').scrollIntoView({behavior:'smooth', block:'center'});
+  } else {
+    const tr = $(`#chgTable tbody tr[data-i="${i}"]`); if (tr) tr.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  drawIso();
+}
+
+/* ---- isometric plot ---- */
+const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+const proj = p => [(p[0] + p[1]) * C30, (p[0] - p[1]) * S30 - p[2]];
+function segsOf(c){
+  const s = [];
+  if (c.centre){ for (const e of c.ends) s.push([e, c.centre]); for (const b of c.branches) s.push([c.centre, b]); }
+  else if (c.ends.length >= 2){ s.push([c.ends[0], c.ends[1]]); for (const b of c.branches) s.push([c.ends[0], b]); }
+  return s;
+}
+function bounds(){
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const r of Q.res.rows) for (const c of [r.a, r.b]) if (c) for (const p of c.pts){ const [x, y] = proj(p); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  if (!isFinite(x0)) return [0, 0, 1, 1];
+  return [x0, y0, x1, y1];
+}
+function fitScale(){ const b = bounds(), box = $('#isoBox'); return Math.min((box.clientWidth - 60) / Math.max(1, b[2] - b[0]), (box.clientHeight - 60) / Math.max(1, b[3] - b[1])); }
+function fitIso(){
+  const b = bounds(), box = $('#isoBox'), s = fitScale();
+  Q.view = {s, tx:box.clientWidth / 2 - (b[0] + b[2]) / 2 * s, ty:box.clientHeight / 2 - (b[1] + b[3]) / 2 * s};
+  drawIso();
+}
+function drawIso(){
+  const svg = $('#isoSvg'); const v = Q.view;
+  const T = p => { const [x, y] = proj(p); return [x * v.s + v.tx, y * v.s + v.ty]; };
+  const col = {added:'#13893f', removed:'#d0312d', modified:'#d97a00', moved:'#6b4fbb', unchanged:'#a3abb3'};
+  let back = '', front = '', hit = '';
+  const rows = Q.res.rows.map((r, i) => ({...r, i}));
+  // draw unchanged first, removed (dashed) next, then changes on top
+  const order = {unchanged:0, removed:1, moved:2, modified:3, added:4};
+  rows.sort((a, b) => order[a.status] - order[b.status]);
+  for (const r of rows){
+    const sel = Q.sel === r.i;
+    const visible = Q.show[r.status];
+    const items = r.status === 'modified' || r.status === 'moved' ? [[r.a, true], [r.b, false]] : [[r.b || r.a, false]];
+    for (const [c, ghost] of items){
+      if (!c) continue;
+      if (!visible && !sel){
+        if (r.status !== 'unchanged' || ghost) continue;
+      }
+      const color = (!visible && r.status === 'unchanged') ? '#d5d9dd' : (ghost ? '#d0312d' : col[r.status]);
+      const isPipe = c.type.startsWith('PIPE');
+      const w = sel ? 5 : (isPipe ? 2 : 3.2);
+      const dash = (r.status === 'removed' || ghost) ? 'stroke-dasharray="6 4"' : '';
+      const op = ghost ? 0.55 : 1;
+      let g = '';
+      for (const [p, q] of segsOf(c)){
+        const [x1, y1] = T(p), [x2, y2] = T(q);
+        g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" ${dash} opacity="${op}"/>`;
+        if (!ghost) hit += `<line data-i="${r.i}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="16" stroke-linecap="round"><title>${esc(compLabel(c) + ' ' + c.code)}</title></line>`;
+      }
+      // symbols
+      const mid = c.ends.length >= 2 ? c.ends[0].map((v, k) => (v + c.ends[1][k]) / 2) : null;
+      if (c.type.startsWith('VALVE') && mid){ const [x, y] = T(mid); g += `<circle cx="${x}" cy="${y}" r="${sel ? 7 : 5.5}" fill="#fff" stroke="${color}" stroke-width="2.4" opacity="${op}"/>`; }
+      else if (c.type.startsWith('FLANGE') && mid){ const [x, y] = T(mid); g += `<rect x="${x - 3.5}" y="${y - 3.5}" width="7" height="7" fill="${color}" opacity="${op}"/>`; }
+      else if (c.type.startsWith('INSTRUMENT') && mid){ const [x, y] = T(mid); g += `<circle cx="${x}" cy="${y}" r="6" fill="#fff" stroke="${color}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="2" fill="${color}"/>`; }
+      const single = c.coords || (!segsOf(c).length && c.pts[0]);
+      if (single){
+        const [x, y] = T(single); const z = sel ? 1.4 : 1;
+        if (c.type === 'SUPPORT') g += `<path d="M${x} ${y - 9 * z} L${x - 7 * z} ${y + 4 * z} L${x + 7 * z} ${y + 4 * z} Z" fill="${color}" ${dash} opacity="${op}"/>`;
+        else g += `<circle cx="${x}" cy="${y}" r="${5 * z}" fill="${color}" opacity="${op}"/>`;
+        if (!ghost) hit += `<circle data-i="${r.i}" cx="${x}" cy="${y}" r="12" fill="transparent"><title>${esc(compLabel(c) + ' ' + c.code)}</title></circle>`;
+      }
+      if (c.type === 'WELD' && c.ends.length){ const [x, y] = T(c.ends[0]); g += `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}"/>`; }
+      if (sel && !ghost){
+        const p = c.centroid; if (p){ const [x, y] = T(p); g = `<circle cx="${x}" cy="${y}" r="22" fill="rgba(31,78,121,.12)" stroke="#1f4e79" stroke-width="1.5"/>` + g; }
+      }
+      if (r.status === 'unchanged') back += g; else front += g;
+    }
+  }
+  svg.innerHTML = back + front + hit;
+  svg.querySelectorAll('[data-i]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); selectRow(+el.dataset.i, false); }));
+}
+// pan & zoom
+(() => {
+  const box = $('#isoBox'); let drag = null; const pts = new Map(); let pinch = null;
+  const zoomAt = (f, cx, cy) => { const v = Q.view; v.tx = cx - (cx - v.tx) * f; v.ty = cy - (cy - v.ty) * f; v.s *= f; drawIso(); };
+  box.addEventListener('wheel', e => { if (!Q.res) return; e.preventDefault(); const r = box.getBoundingClientRect(); zoomAt(e.deltaY < 0 ? 1.18 : 1 / 1.18, e.clientX - r.left, e.clientY - r.top); }, {passive:false});
+  box.addEventListener('pointerdown', e => {
+    if (e.target.closest('.ctl')) return;
+    pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) drag = {x:e.clientX, y:e.clientY, tx:Q.view.tx, ty:Q.view.ty, moved:false};
+    if (pts.size === 2){ const [a, b] = [...pts.values()]; pinch = {d:Math.hypot(a[0] - b[0], a[1] - b[1])}; drag = null; }
+  });
+  box.addEventListener('pointermove', e => {
+    if (!pts.has(e.pointerId) || !Q.res) return;
+    pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pinch && pts.size === 2){
+      const [a, b] = [...pts.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); const r = box.getBoundingClientRect();
+      zoomAt(d / pinch.d, (a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top); pinch.d = d; return;
+    }
+    if (drag){
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+      if (drag.moved){ Q.view.tx = drag.tx + dx; Q.view.ty = drag.ty + dy; drawIso(); }
+    }
+  });
+  const end = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; if (!pts.size) drag = null; };
+  box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
+  const btnZoom = f => { if (!Q.res) return; zoomAt(f, box.clientWidth / 2, box.clientHeight / 2); };
+  $('#isoIn').onclick = () => btnZoom(1.4); $('#isoOut').onclick = () => btnZoom(1 / 1.4); $('#isoFit').onclick = () => Q.res && fitIso();
+})();
+window.addEventListener('resize', () => { if (Q.res && !$('#tab-pcf').classList.contains('hidden')) drawIso(); });
+$$('.tab').forEach(t => t.addEventListener('click', () => { if (t.dataset.tab === 'pcf' && Q.res) setTimeout(fitIso, 0); if (t.dataset.tab === 'pdf' && P.cRes) setTimeout(fitZoom, 0); }));
+</script>
+</body>
+</html>
