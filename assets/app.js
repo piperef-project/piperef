@@ -263,13 +263,13 @@ function seg(id,opts,cur){return `<div class="seg" id="${id}">${opts.map(o=>{con
 function bindSeg(id,fn){const el=document.getElementById(id);if(!el)return;el.addEventListener('click',e=>{const b=e.target.closest('button');if(b)fn(b.dataset.v);});}
 
 /* ============================== TABS ============================== */
-const TABS=[['home','Home'],['size','Size sheet'],['pipe','Pipe'],['flange','Flanges'],['bw','Butt-weld fittings'],['sw','Socket weld & NPT'],['gasket','Gaskets'],['blind','Figure-8 & paddle'],['pt','P–T ratings'],['span','Support spans'],['spc','Pipe spacing'],['vdim','Valves'],['valve','Valve access'],['acc','Access & maintenance'],['shoe','Shoe spool length'],['eqck','Equipment data check'],['calc','Calculators'],['iso','Iso compare'],['contact','Contact us']];
-const PAGE={"home": "index.html", "size": "size-sheet.html", "pipe": "pipe.html", "flange": "flanges.html", "bw": "butt-weld-fittings.html", "sw": "socket-weld-npt.html", "gasket": "gaskets.html", "blind": "line-blinds.html", "pt": "pt-ratings.html", "span": "support-spans.html", "spc": "pipe-spacing.html", "vdim": "valves.html", "valve": "valve-access.html", "acc": "access-maintenance.html", "shoe": "shoe-spool-length.html", "eqck": "equipment-data-check.html", "calc": "calculators.html", "iso": "iso-compare.html", "contact": "contact.html"};
+const TABS=[['home','Home'],['size','Size sheet'],['pipe','Pipe'],['flange','Flanges'],['bw','Butt-weld fittings'],['sw','Socket weld & NPT'],['gasket','Gaskets'],['blind','Figure-8 & paddle'],['pt','P–T ratings'],['span','Support spans'],['sup','Pipe supports'],['spc','Pipe spacing'],['vdim','Valves'],['valve','Valve access'],['acc','Access & maintenance'],['shoe','Shoe spool length'],['eqck','Equipment data check'],['calc','Calculators'],['iso','Iso compare'],['contact','Contact us']];
+const PAGE={"home": "index.html", "size": "size-sheet.html", "pipe": "pipe.html", "flange": "flanges.html", "bw": "butt-weld-fittings.html", "sw": "socket-weld-npt.html", "gasket": "gaskets.html", "blind": "line-blinds.html", "pt": "pt-ratings.html", "span": "support-spans.html", "sup": "pipe-supports.html", "spc": "pipe-spacing.html", "vdim": "valves.html", "valve": "valve-access.html", "acc": "access-maintenance.html", "shoe": "shoe-spool-length.html", "eqck": "equipment-data-check.html", "calc": "calculators.html", "iso": "iso-compare.html", "contact": "contact.html"};
 let TAB=document.body.dataset.page||'home';if(!TABS.some(t=>t[0]===TAB))TAB='home';
 let PREV_TAB=null;
 /* Sidebar groups: every tab appears exactly once */
-const NAV_GROUPS=[['Overview',['home','size']],['Pipe',['pipe','span','spc']],['Fittings & flanges',['flange','pt','bw','sw','gasket','blind']],['Valves',['vdim','valve']],['Layout & checks',['shoe','acc','eqck','calc','iso']]];
-const TAB_STD={size:'All tables',pipe:'B36.10M / B36.19M',flange:'B16.5',pt:'B16.5 Gr 1.1 / 2.1 / 2.2',bw:'B16.9',sw:'B16.11 / B1.20.1',gasket:'B16.20',blind:'B16.48',span:'B31.1',spc:'B16.5 / B36.10M',vdim:'B16.10 / API 609',valve:'ASTM F1166',shoe:'B16.5',calc:'B31.3 / B16.5',eqck:'ASME VIII / API',acc:'OSHA / PIP',iso:'PDF / PCF',contact:''};
+const NAV_GROUPS=[['Overview',['home','size']],['Pipe',['pipe','span','sup','spc']],['Fittings & flanges',['flange','pt','bw','sw','gasket','blind']],['Valves',['vdim','valve']],['Layout & checks',['shoe','acc','eqck','calc','iso']]];
+const TAB_STD={size:'All tables',pipe:'B36.10M / B36.19M',flange:'B16.5',pt:'B16.5 Gr 1.1 / 2.1 / 2.2',bw:'B16.9',sw:'B16.11 / B1.20.1',gasket:'B16.20',blind:'B16.48',span:'B31.1',sup:'MSS SP-58',spc:'B16.5 / B36.10M',vdim:'B16.10 / API 609',valve:'ASTM F1166',shoe:'B16.5',calc:'B31.3 / B16.5',eqck:'ASME VIII / API',acc:'OSHA / PIP',iso:'PDF / PCF',contact:''};
 const TAB_LBL=Object.fromEntries(TABS);
 function tabGroup(k){const g=NAV_GROUPS.find(g=>g[1].includes(k));return g?g[0]:'';}
 function renderTabs(){
@@ -278,7 +278,7 @@ function renderTabs(){
  const sc=document.getElementById('sideContact');if(sc)sc.setAttribute('aria-current',TAB==='contact'?'page':'false');
  document.querySelectorAll('.panel').forEach(p=>{p.hidden=p.dataset.tab!==TAB;if(!p.hidden&&PREV_TAB&&PREV_TAB!==TAB){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}});
  document.querySelectorAll('.refs').forEach(r=>r.hidden=r.dataset.for!==TAB);
- PREV_TAB=TAB;if(TAB==='iso')loadIso();if(typeof M3!=='undefined')M3.redrawAll();}
+ PREV_TAB=TAB;if(TAB==='iso')loadIso();if(TAB==='sup'&&!window.__supLoaded){window.__supLoaded=1;import('./supports.js').catch(()=>{const p=document.getElementById('p-sup');if(p)p.innerHTML='<div class="phead"><div><h2>Pipe supports</h2><p>The 3D viewer could not load in this browser.</p></div></div>';});}if(typeof M3!=='undefined')M3.redrawAll();}
 function loadIso(){const f=document.getElementById('isoFrame');if(!f||f.getAttribute('src'))return;f.src=f.dataset.src;}
 $('#tabs').addEventListener('click',e=>{const a=e.target.closest('a[data-t]');if(!a)return;if(a.dataset.t===TAB){e.preventDefault();window.scrollTo({top:0});}});
 
@@ -1950,6 +1950,7 @@ function renderRefs(){
 const REDUCED=(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}})();
 const IC=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
 const TAB_ICON={
+ sup:IC('<circle cx="12" cy="8" r="4.5"/><path d="M12 12.5V16M7 16h10M4 20h16"/>'),
  home:IC('<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>'),
  size:IC('<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'),
  pipe:IC('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5"/>'),
@@ -1970,7 +1971,7 @@ const TAB_ICON={
  iso:IC('<path d="M3 17l6-3.5 6 3.5 6-3.5"/><path d="M9 13.5V6l6 3.5v7.5" stroke-dasharray="2 2"/><path d="M15 9.5L21 6"/>'),
  calc:IC('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>')
 };
-const HOME_DESC={size:'Everything for one line size on one sheet',pipe:'OD, wall, ID and weight by schedule',flange:'B16.5 dimensions and bolting, with 3D view',bw:'Elbows, tees, reducers and caps, with 3D view',sw:'Socket weld fittings and NPT threads',gasket:'Spiral wound gasket rings',blind:'Spectacle blinds, paddle blanks and spacers: RF, FF, RTJ',pt:'Pressure–temperature ratings',span:'Suggested support spacing',spc:'Centre-to-centre spacing on racks',vdim:'Face-to-face, stem height and handwheel, with 3D view',valve:'Handwheel heights and reach',shoe:'Preliminary spool length for shoes',eqck:'What to verify on vendor drawings and datasheets',calc:'Wall thickness, flange class, offsets, bolts',acc:'Escape and access routes, roads, crane and lift space',iso:'IFC vs latest isometric: PDF overlay and PCF change list',contact:'Feedback, corrections and ideas: contact.piperef@gmail.com'};
+const HOME_DESC={sup:'Support types in 3D: shoes, guides, stops, hangers, springs',size:'Everything for one line size on one sheet',pipe:'OD, wall, ID and weight by schedule',flange:'B16.5 dimensions and bolting, with 3D view',bw:'Elbows, tees, reducers and caps, with 3D view',sw:'Socket weld fittings and NPT threads',gasket:'Spiral wound gasket rings',blind:'Spectacle blinds, paddle blanks and spacers: RF, FF, RTJ',pt:'Pressure–temperature ratings',span:'Suggested support spacing',spc:'Centre-to-centre spacing on racks',vdim:'Face-to-face, stem height and handwheel, with 3D view',valve:'Handwheel heights and reach',shoe:'Preliminary spool length for shoes',eqck:'What to verify on vendor drawings and datasheets',calc:'Wall thickness, flange class, offsets, bolts',acc:'Escape and access routes, roads, crane and lift space',iso:'IFC vs latest isometric: PDF overlay and PCF change list',contact:'Feedback, corrections and ideas: contact.piperef@gmail.com'};
 document.getElementById('ctCopy').addEventListener('click',e=>{const b=e.currentTarget,a='contact.piperef@gmail.com',done=()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy address',1600);};
  try{navigator.clipboard.writeText(a).then(done,()=>{fallbackCopy(a);done();});}catch(err){fallbackCopy(a);done();}});
 function fallbackCopy(a){const t=document.createElement('textarea');t.value=a;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}t.remove();}

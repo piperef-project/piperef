@@ -41,7 +41,7 @@ const KW={size:'line size summary everything one sheet',pipe:'od outside diamete
  flange:'b16.5 wn weld neck slip on socket weld threaded npt lap joint stub end blind flange bolt circle pcd stud bolting raised face rf hub class 400',pt:'pressure temperature rating class 150 300 400 600 900 1500 2500 material group 1.1 2.1 2.2 carbon steel 304 316 stainless flange rating',
  bw:'b16.9 elbow 90 45 tee reducer cap return lr sr butt weld centre to end center',sw:'b16.11 socket weld threaded npt coupling forged fittings 3000 6000 b1.20.1 thread',
  gasket:'b16.20 spiral wound gasket winding centering ring inner ring filler graphite ptfe',blind:'b16.48 spectacle figure 8 paddle blank spacer rtj line blind',
- span:'support span spacing pipe supports b31.1 deflection',spc:'rack spacing centre to centre pipe rack clearance insulation',
+ span:'support span spacing pipe supports b31.1 deflection',sup:'pipe supports shoe guide line stop anchor hold down u-bolt trunnion dummy leg clevis hanger clamp riser spring variable constant snubber pipe roll slide plate ptfe cold shoe mss sp-58 3d',spc:'rack spacing centre to centre pipe rack clearance insulation',
  vdim:'valve face to face b16.10 api 609 butterfly gate globe check ball handwheel stem height',valve:'valve access operability handwheel height reach f1166',
  shoe:'shoe support spool minimum spool length bolt removal clearance stud pipe support',acc:'access maintenance escape route crane road lift clearance',
  eqck:'equipment vendor drawing datasheet nozzle checklist verify',calc:'calculator wall thickness b31.3 flange class bolt length rolling offset slope elbow take-off unit converter pipe id',
