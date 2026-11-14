@@ -205,7 +205,7 @@ function enhanceTables(){
   $('.tt-b',bar).addEventListener('click',()=>{const vis=rows.filter(r=>!r.hidden);
    const head=sortable?[[...last.cells].map(thTxt)]:hRows.map(r=>[...r.cells].flatMap(c=>[thTxt(c),...Array(Math.max(0,c.colSpan-1)).fill('')]));
    const tsv=[...head,...vis.map(r=>[...r.cells].map(cellTxt))].map(r=>r.join('\t')).join('\n');
-   const sec=panel&&$('.phead h2',panel);copy(tsv,`Copied ${vis.length} rows${sec?' from '+sec.textContent.trim():''}. Paste into Excel.`);});
+   const sec=panel&&$('.phead h1,.phead h2',panel);copy(tsv,`Copied ${vis.length} rows${sec?' from '+sec.textContent.trim():''}. Paste into Excel.`);});
   apply();sortNow();});}
 let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;enhanceTables();dimAll();});};
 new MutationObserver(schedule).observe($('#main'),{childList:true,subtree:true});
