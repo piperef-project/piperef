@@ -2688,3 +2688,36 @@ $('#npsSel').value=SEL;$('#npsSel').onchange=e=>setSel(e.target.value);
 document.addEventListener('click',e=>{const r=e.target.closest('tbody tr[data-nps]');if(r&&!r.closest('#p-calc'))setSel(r.dataset.nps);});
 renderTabs();renderUnits();renderData();renderValve();renderShoe();renderEq();renderCalc();/* reference blocks removed from all tabs */
 $('#thBtn').addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));applyTheme(document.documentElement.dataset.theme||'light');renderTabs();
+
+/* ---------- correction / contact form (Web3Forms → contact.piperef@gmail.com) ---------- */
+(()=>{
+  const WEB3FORMS_KEY='PASTE_ACCESS_KEY_HERE'; // free key from web3forms.com, made for contact.piperef@gmail.com
+  const f=document.getElementById('cfForm'); if(!f) return;
+  const msg=document.getElementById('cfMsg'), btn=document.getElementById('cfSend'), page=document.getElementById('cfPage');
+  try{const r=document.referrer&&new URL(document.referrer); if(r&&r.origin===location.origin&&!/contact/.test(r.pathname)){
+    const n=r.pathname.replace(/^\/|\.html$/g,'')||'home'; page.value=n.replace(/-/g,' ').replace(/^./,c=>c.toUpperCase());}}catch(e){}
+  const setType=()=>f.classList.toggle('no-corr',f.type.value!=='Correction');
+  f.addEventListener('change',e=>{if(e.target.name==='type')setType();}); setType();
+  const say=(t,c)=>{msg.textContent=t;msg.className='cf-msg '+(c||'');};
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(!f.message.value.trim()){say('Please write a message.','err');f.message.focus();return;}
+    if(f.email.value&&!f.email.checkValidity()){say('That email address looks incomplete.','err');f.email.focus();return;}
+    if(f.botcheck.checked) return;
+    const type=f.type.value, pg=f.page.value.trim();
+    const data={access_key:WEB3FORMS_KEY,from_name:'Pipe Ref website',
+      subject:`Pipe Ref ${type.toLowerCase()}${type==='Correction'&&pg?': '+pg:''}`,
+      type, name:f.name.value.trim()||'(not given)', email:f.email.value.trim()||'(not given)',
+      ...(type==='Correction'?{page:pg||'(not given)',reference:f.reference.value.trim()||'(not given)'}:{}),
+      message:f.message.value.trim(), sent_from:location.href};
+    if(f.email.value) data.replyto=f.email.value.trim();
+    btn.disabled=true; say('Sending…');
+    try{
+      const r=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)});
+      const j=await r.json().catch(()=>({}));
+      if(r.ok&&j.success){f.reset();setType();say('Thanks — your message has been sent.','ok');}
+      else throw new Error(j.message||r.status);
+    }catch(err){say('Could not send right now. Please email contact.piperef@gmail.com instead.','err');}
+    finally{btn.disabled=false;}
+  });
+})();
