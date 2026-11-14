@@ -2691,7 +2691,7 @@ $('#thBtn').addEventListener('click',()=>applyTheme(document.documentElement.dat
 
 /* ---------- correction / contact form (Web3Forms → contact.piperef@gmail.com) ---------- */
 (()=>{
-  const WEB3FORMS_KEY='PASTE_ACCESS_KEY_HERE'; // free key from web3forms.com, made for contact.piperef@gmail.com
+  const WEB3FORMS_KEY='99b731d0-1652-4a8a-95ea-851ce9e4f168'; // free key from web3forms.com, made for contact.piperef@gmail.com
   const f=document.getElementById('cfForm'); if(!f) return;
   const msg=document.getElementById('cfMsg'), btn=document.getElementById('cfSend'), page=document.getElementById('cfPage');
   try{const r=document.referrer&&new URL(document.referrer); if(r&&r.origin===location.origin&&!/contact/.test(r.pathname)){
