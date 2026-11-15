@@ -49,7 +49,8 @@ function pageBar(){const k=document.body.dataset.page;if(k==='home'||$('.pagebar
  bar.innerHTML=`<ol class="crumbs" aria-label="Breadcrumb"><li><a href="index.html">Home</a></li>${g&&g!==lbl?`<li><span>${esc(g)}</span></li>`:''}<li><span aria-current="page">${esc(lbl)}</span></li></ol><div class="stds" aria-label="Governing standards">${chips}</div>`;
  $('#main').prepend(bar);
  /* data version chip, from the correction log */
- const add=()=>fetch('assets/corrections.json').then(r=>r.ok?r.json():null).then(j=>{const v=j&&j.datasets&&j.datasets[k];if(!v)return;const st=$('.stds',bar);if(!st||$('.ver-chip',st))return;const a=document.createElement('a');a.className='std-chip ver-chip';a.href='contact.html#data-versions';a.title='Data version of this page. Updated '+v.date+'. See the correction history.';a.innerHTML=`<i></i>Data v${esc(v.v)}`;st.append(a);}).catch(()=>{});
+ const API=(()=>{try{return localStorage.getItem('pr_api')||'https://api.piperef.site'}catch(e){return 'https://api.piperef.site'}})();
+ const add=()=>fetch(API+'/api/versions').then(r=>r.ok?r.json():Promise.reject()).catch(()=>fetch('assets/corrections.json').then(r=>r.ok?r.json():null)).then(j=>{const v=j&&j.datasets&&j.datasets[k];if(!v)return;const st=$('.stds',bar);if(!st||$('.ver-chip',st))return;const a=document.createElement('a');a.className='std-chip ver-chip';a.href='contact.html#data-versions';a.title='Data version of this page. Updated '+v.date+'. See the correction history.';a.innerHTML=`<i></i>Data v${esc(v.v)}`;st.append(a);}).catch(()=>{});
  ('requestIdleCallback' in window)?requestIdleCallback(add,{timeout:3000}):setTimeout(add,1500);}
 
 /* ---------- search index ---------- */

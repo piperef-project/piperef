@@ -50,8 +50,11 @@ const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"
 const ABC='23456789ABCDEFGHJKMNPQRSTUVWXYZ';
 const newRef=type=>{const d=new Date(),p=n=>String(n).padStart(2,'0');let r='';const a=new Uint8Array(4);(crypto||window.msCrypto).getRandomValues(a);a.forEach(b=>r+=ABC[b%ABC.length]);
  return `PR-${type==='Question'?'Q':type==='New tool idea'?'I':'C'}-${String(d.getFullYear()).slice(2)}${p(d.getMonth()+1)}${p(d.getDate())}-${r}`;};
-let LOG={datasets:{},items:[]};
-const loaded=fetch('assets/corrections.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(j)LOG=j;}).catch(()=>{});
+let LOG={datasets:{},items:[]},LIVE=false;
+const API=(()=>{try{return localStorage.getItem('pr_api')||'https://api.piperef.site'}catch(e){return 'https://api.piperef.site'}})();
+const getJ=(u,o)=>fetch(u,o).then(r=>r.ok?r.json():Promise.reject(r.status));
+const loaded=getJ(API+'/api/log',{cache:'no-cache'}).then(j=>{LOG=j;LIVE=true;})
+ .catch(()=>getJ('assets/corrections.json',{cache:'no-cache'}).then(j=>{LOG=j;}).catch(()=>{}));
 const ver=k=>LOG.datasets&&LOG.datasets[k]?LOG.datasets[k]:null;
 
 /* ------------------------------------------------------------ form: page select, reference, data version */
@@ -65,7 +68,7 @@ const meta=document.createElement('div');meta.className='cr-meta cf-corr';meta.s
 F.querySelector('.cf-grid').after(meta);
 let REF=newRef(F.type.value);
 const showMeta=()=>{const k=sel.value,v=ver(k),t=F.type.value;if(!REF.includes(`-${t==='Question'?'Q':t==='New tool idea'?'I':'C'}-`))REF=newRef(t);
- meta.innerHTML=`<span>Reference <b>${REF}</b></span>${t==='Correction'?`<span>Affected data <b>${k&&k!=='other'?esc(LBL(k))+(v?` v${v.v}`:''):'not chosen'}</b>${v?` (updated ${fmtD(v.date)})`:''}</span>`:''}<span>Date <b>${fmtD(today())}</b></span>`;
+ meta.innerHTML=`<span>Reference number <b>given when you send</b></span>${t==='Correction'?`<span>Affected data <b>${k&&k!=='other'?esc(LBL(k))+(v?` v${v.v}`:''):'not chosen'}</b>${v?` (updated ${fmtD(v.date)})`:''}</span>`:''}<span>Date <b>${fmtD(today())}</b></span>`;
  meta.classList.toggle('cf-corr',t==='Correction');};
 sel.addEventListener('change',()=>{inp.value=sel.value&&sel.value!=='other'?LBL(sel.value):sel.value==='other'?'Other / whole site':'';showMeta();});
 F.addEventListener('change',e=>{if(e.target.name==='type')showMeta();});
@@ -74,6 +77,9 @@ sel.dispatchEvent(new Event('change'));loaded.then(showMeta);
 /* hooks used by the send code in app.js */
 window.__corr={
  fields(type){const k=sel.value,v=ver(k);return {reference_no:REF,submitted_on:today(),...(type==='Correction'?{page_key:k||'(not chosen)',data_version:v?`v${v.v} (${v.date})`:'(not versioned)'}:{})};},
+ /* log the message on the server first, so the reference comes from there; fall back to the local reference if the server is not reachable */
+ async register(type,b){try{const j=await getJ(API+'/api/corrections',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({type,page:sel.value||null,std_ref:b.reference,message:b.message,name:b.name,email:b.email,botcheck:b.botcheck})});if(j&&j.ref){REF=j.ref;return {...this.fields(type),logged:'yes'};}}catch(e){if(e===400||e===429)throw e;}
+  return {...this.fields(type),logged:'no (server not reachable; add it in the admin)'};},
  sent(type){const k=sel.value,v=ver(k),rec={ref:REF,date:today(),type,page:k,ver:v?v.v:''};saveMine([...mine(),rec]);const r=REF;REF=newRef(type);sel.value='';inp.value='';showMeta();draw();return r;}};
 
 /* ------------------------------------------------------------ tracking, history, versions */
@@ -90,10 +96,11 @@ function card(it,local){
  <dt>Date of correction</dt><dd>${it.corrected?fmtD(it.corrected):it.status==='closed'?'No change needed':'Not yet'}</dd>
  ${it.summary?`<dt>Outcome</dt><dd>${esc(it.summary)}</dd>`:''}
  ${(it.history||[]).length?`<dt>History</dt><dd>${it.history.map(h=>`${fmtD(h.date)}: ${STS[h.status]||h.status}${h.note?' – '+esc(h.note):''}`).join('<br>')}</dd>`:''}</dl>
- ${!LOG.items.find(x=>x.ref===it.ref)?'<p class="sub" style="margin:10px 0 0">Received. It appears in the public history once the review starts.</p>':''}</div>`;}
-function find(ref){ref=(ref||'').trim().toUpperCase();const out=box.querySelector('.cr-res');if(!ref){out.innerHTML='';return;}
- const it=LOG.items.find(x=>x.ref.toUpperCase()===ref),loc=mine().find(x=>x.ref.toUpperCase()===ref);
- out.innerHTML=it||loc?card(it,loc):`<div class="cr-empty">No correction found for <b>${esc(ref)}</b>. Check the number (format PR-C-YYMMDD-XXXX). New submissions show here from the browser they were sent from, and for everyone once the review starts.</div>`;
+ ${it.status==='submitted'?'<p class="sub" style="margin:10px 0 0">Received. It appears in the public history once the review starts.</p>':''}</div>`;}
+async function find(ref){ref=(ref||'').trim().toUpperCase();const out=box.querySelector('.cr-res');if(!ref){out.innerHTML='';return;}
+ let it=LOG.items.find(x=>x.ref.toUpperCase()===ref);const loc=mine().find(x=>x.ref.toUpperCase()===ref);
+ if(!it&&/^PR-[CQI]-\d{6}-[A-Z0-9]{4,6}$/.test(ref)){out.innerHTML='<div class="cr-empty">Checking…</div>';try{it=await getJ(API+'/api/corrections/'+encodeURIComponent(ref));}catch(e){}}
+ out.innerHTML=it||loc?card(it,loc):`<div class="cr-empty">No correction found for <b>${esc(ref)}</b>. Check the number (format PR-C-YYMMDD-XXXXX).</div>`;
  try{history.replaceState(null,'',location.pathname+'?ref='+encodeURIComponent(ref)+'#track');}catch(e){}}
 function draw(){
  const my=mine().slice().reverse(),items=LOG.items.slice().sort((a,b)=>(b.submitted||'').localeCompare(a.submitted||'')),mineRefs=new Set(my.map(x=>x.ref));
