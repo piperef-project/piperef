@@ -827,7 +827,7 @@ details>summary{color:var(--ink-2)}
 .cf-or{font-size:12.5px;color:var(--muted);margin:0 0 8px}
 @media (max-width:640px){.cf-grid{grid-template-columns:1fr}}
 html:not(.js-ready) .foot{visibility:hidden}
-#p-cv,#p-rack,#p-fj,#p-exp{min-height:calc(100vh - var(--top))}
+#p-cv,#p-rack,#p-fj,#p-exp,#p-pid{min-height:calc(100vh - var(--top))}
 
 /* language picker + machine translation */
 .lang{position:relative}
@@ -857,3 +857,4 @@ font[style*="background-color"]{background:none!important;box-shadow:none!import
 .ex-pre .chat-b{margin-left:10px;height:28px;vertical-align:middle}
 
 @media (max-width:560px){.ctrls,.ctrl{max-width:100%;min-width:0}.ctrls .seg{flex-wrap:wrap;max-width:100%;height:auto}.ctrls .seg button{flex:1 1 auto}}
+body:has(#p-pid:not([hidden])) .top-ctrls>.tc{display:none}
