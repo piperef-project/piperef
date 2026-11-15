@@ -24,6 +24,8 @@ if(!document.getElementById('exp-css')){const st=document.createElement('style')
 #p-exp .ex-t td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #p-exp .ex-t tr.tot td{font-weight:650}
 #p-exp .ex-ok{color:#147A4A;font-weight:650}#p-exp .ex-bad{color:#B42318;font-weight:650}
+#p-exp .ex-pre{margin:14px 0 4px;padding:12px 14px;border:1px solid #E9B949;border-left:4px solid #C98A04;border-radius:10px;background:#FFF8E6;color:#5C4300;font-size:13.5px;line-height:1.5}#p-exp .ex-pre b{color:#4A3600}#p-exp .ex-pre-s{margin:10px 0 0;padding:8px 12px;font-size:13px}
+[data-theme=dark] #p-exp .ex-pre{background:rgba(233,185,73,.12);border-color:rgba(233,185,73,.5);color:#F2D58E}[data-theme=dark] #p-exp .ex-pre b{color:#FBE3A6}
 #p-exp .ex-how{margin:14px 0 4px}#p-exp .ex-how summary{cursor:pointer;font-size:16px;font-weight:650}#p-exp .ex-how-g{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}#p-exp .ex-how h4{margin:0 0 4px;font-size:14px}
 @media (max-width:760px){#p-exp .ex-how-g{grid-template-columns:1fr}}
 #p-exp .ex-warn{font-size:12.5px;color:#9A6A08;margin:8px 0 0}
@@ -123,7 +125,7 @@ function render(){
  let n=SEL;if(!SZ.includes(n)){const v=NUM(SEL);n=SZ.find(x=>NUM(x)>=v)||'6';}
  const r=calc(n),M=r.M,schs=Object.keys(PIPEMAP[n][2]);
  const pct=r.sig/r.SA*100;
- const head=`<div class="phead"><div><h1>Expansion loop sizing</h1><p>How much a hot line grows between anchors, and how long the loop legs must be to take it, by the guided cantilever method. For early layout and rack planning; the stress analysis confirms it.</p></div></div><details class="ex-card ex-how" open><summary>How to use this in your layout work</summary>
+ const head=`<div class="phead"><div><h1>Expansion loop sizing</h1><p>How much a hot line grows between anchors, and how long the loop legs must be to take it, by the guided cantilever method. For early layout and rack planning; the stress analysis confirms it.</p></div></div><div class="ex-pre" role="note"><b>Preliminary only. A stress analysis is still required.</b> These loop sizes, forces and stresses are for early layout and space reservation. The final loop, anchors, guides, line stops and nozzle loads must come from a stress analysis (CAESAR II or similar) by the stress engineer, to the project\'s code and specification.</div><details class="ex-card ex-how" open><summary>How to use this in your layout work</summary>
   <div class="ex-how-g"><div><h4>When it helps</h4><ul>
    <li><b>Planning a pipe rack:</b> check the hot lines before the rack width and tiers are fixed, and keep a loop bay where the loops will go.</li>
    <li><b>Placing the loop bay:</b> compare loop heights of several hot lines to nest them, hottest or largest outermost, and see how much room the bay needs.</li>
@@ -154,6 +156,7 @@ function render(){
  P.innerHTML=head+ctrl+`
  <div class="ex-box"><div class="ex-draw">${S.ty==='u'?drawU(r,fm):drawL(r,fm)}</div>
   <div class="ex-sum"><div><span>Thermal growth</span><b>${fm(r.dT)}</b></div><div><span>${S.ty==='u'?'Loop height H':'Short leg, minimum'}</span><b>${fm(r.H)}</b></div>${S.ty!=='l'?`<div><span>Loop width W</span><b>${fm(r.W)}</b></div>`:''}<div><span>Extra pipe</span><b>${fm(r.extra)}</b></div><div><span>Force on anchors, approx.</span><b>${IN()?Math.round(r.F*224.8).toLocaleString('en-US')+' lbf':r.F.toFixed(1)+' kN'}</b></div></div></div>
+ <p class="ex-pre ex-pre-s" role="note">Preliminary values. Confirm with the stress analysis before issuing drawings or ordering.</p>
  <div class="ex-out">
   <div class="ex-card"><h3>Thermal growth</h3>${rows([
    [`Expansion of ${M.e==='cs'?'carbon steel':'austenitic stainless'} from ${tShow(S.tam)} to ${tShow(S.top)} ${tU()}`,IN()?`${(r.emm*30.48/25.4).toFixed(2)} in/100 ft`:`${r.emm.toFixed(2)} mm/m`],
