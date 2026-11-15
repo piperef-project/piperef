@@ -10,7 +10,7 @@ const plain=h=>{const d=document.createElement('div');d.innerHTML=h;return d.tex
 const isMac=/Mac|iPhone|iPad/.test(navigator.platform||'');
 const SVG=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
 const ICO={search:SVG('<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>'),copy:SVG('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
- val:SVG('<path d="M4 7h16M4 12h10M4 17h7"/>'),calc:SVG('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>')};
+ val:SVG('<path d="M4 7h16M4 12h10M4 17h7"/>'),share:SVG('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12.5h5"/>'),calc:SVG('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>')};
 
 /* ---------- clipboard + toast ---------- */
 const toastEl=$('#toast');let toastT;
@@ -18,6 +18,19 @@ function toast(msg){if(!toastEl)return;toastEl.textContent=msg;toastEl.classList
 function copy(text,msg){const done=()=>toast(msg||`Copied ${text.length>40?'to clipboard':text}`);
  const fb=()=>{const t=document.createElement('textarea');t.value=text;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();try{document.execCommand('copy');done();}catch(e){toast('Copy is blocked by the browser. Select the value and press Ctrl+C.');}t.remove();};
  try{navigator.clipboard.writeText(text).then(done,fb);}catch(e){fb();}}
+/* copy as rich text (a small table for Teams / Outlook) with a plain-text twin (WhatsApp, SMS) */
+function copyRich(html,text,msg){const done=()=>toast(msg);
+ try{if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]).then(done,()=>copy(text,msg));return;}}catch(e){}
+ copy(text,msg);}
+const pageUrl=()=>'https://piperef.site'+location.pathname.replace(/\/index\.html$/,'/');
+const unitNow=()=>{const b=document.querySelector('#unitSeg button[aria-pressed="true"]');return b?b.textContent.trim():'';};
+/* share block: title, context line, label/value pairs. Pages call window.shareChat({title,sub,rows:[[k,v]],note}) */
+function shareChat(o){const rows=(o.rows||[]).filter(r=>r&&r[1]!=null&&String(r[1]).trim()!=='');
+ const text=[o.title,o.sub,'',...rows.map(([k,v])=>`${k}: ${v}`),'',o.note||'','Source: Pipe Ref, '+pageUrl()].filter((l,i,a)=>!(l===''&&a[i-1]==='')).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+ const td='style="border:1px solid #C9D1DB;padding:4px 8px;text-align:left"';
+ const html=`<div style="font-family:Segoe UI,Arial,sans-serif;font-size:14px"><p style="margin:0 0 6px"><b>${esc(o.title)}</b>${o.sub?'<br>'+esc(o.sub):''}</p><table style="border-collapse:collapse;font-size:14px">${rows.map(([k,v])=>`<tr><td ${td}>${esc(k)}</td><td ${td}><b>${esc(v)}</b></td></tr>`).join('')}</table>${o.note?`<p style="margin:6px 0 0;color:#555">${esc(o.note)}</p>`:''}<p style="margin:6px 0 0;color:#555">Source: <a href="${pageUrl()}">Pipe Ref</a></p></div>`;
+ copyRich(html,text,o.msg||'Copied. Paste it into Teams, WhatsApp or email.');}
+window.shareChat=shareChat;
 function flash(el){el.classList.remove('copied');void el.offsetWidth;el.classList.add('copied');}
 
 /* ---------- mobile drawer ---------- */
@@ -180,6 +193,8 @@ const num=t=>{t=t.replace(/[″"′,]/g,'').trim();const m=/^-?\d+(?:-\d+\/\d+|\
 const cellTxt=c=>c.textContent.replace(/\s+/g,' ').trim();
 const thTxt=th=>{const s=th.querySelector('small');const main=s?th.textContent.replace(s.textContent,'').trim():th.textContent.trim();return (s?`${main} (${s.textContent.trim()})`:main).replace(/\s+/g,' ');};
 const hasTouch=matchMedia('(pointer:coarse)').matches;
+function ctxOf(tw,panel){let n=tw;while(n&&n!==panel){let p=n.previousElementSibling;while(p){if(/^H[2-4]$/.test(p.tagName))return p.textContent.trim();const h=p.querySelector&&p.querySelector('h2,h3,h4');if(h&&!p.classList.contains('phead'))return h.textContent.trim();p=p.previousElementSibling;}n=n.parentElement;}return '';}
+function shareLabels(){$$('#main .tt').forEach(bar=>{const b=$('.tt-s span',bar);if(!b)return;const tw=bar.nextElementSibling,r=tw&&$('tbody tr.hi',tw);b.textContent=r?`Copy ${cellTxt(r.cells[0])} for chat`:'Copy row for chat';});}
 function enhanceTables(){
  $$('#main .tw').forEach((tw,idx)=>{if(tw.dataset.tt||tw.closest('.calc,.cmdk'))return;const table=$('table',tw);if(!table||!table.tBodies[0])return;
   tw.dataset.tt='1';const body=table.tBodies[0],rows=[...body.rows];if(rows.length<4)return;
@@ -188,7 +203,7 @@ function enhanceTables(){
   const hRows=table.tHead?[...table.tHead.rows]:[],last=hRows[hRows.length-1],ncol=rows[0].cells.length;
   const sortable=last&&last.cells.length===ncol&&![...last.cells].some(c=>c.colSpan>1)&&!rows.some(r=>[...r.cells].some(c=>c.colSpan>1));
   const bar=document.createElement('div');bar.className='tt';const filt=rows.length>=6;
-  bar.innerHTML=`${filt?`<label class="tt-f">${ICO.search}<span class="sr">Filter rows</span><input type="search" placeholder="Filter rows" value="${esc(st.q)}" autocomplete="off"></label>`:''}<span class="tt-n" aria-live="polite"></span>${hasTouch?'':'<span class="tt-hint">Double-click a value to copy it</span>'}<button class="tt-b" type="button">${ICO.copy}Copy table</button>`;
+  bar.innerHTML=`${filt?`<label class="tt-f">${ICO.search}<span class="sr">Filter rows</span><input type="search" placeholder="Filter rows" value="${esc(st.q)}" autocomplete="off"></label>`:''}<span class="tt-n" aria-live="polite"></span>${hasTouch?'':'<span class="tt-hint">Double-click a value to copy it</span>'}<button class="tt-b tt-s" type="button" title="Copy the highlighted row as a short message for Teams, WhatsApp or email">${ICO.share}<span>Copy row for chat</span></button><button class="tt-b tt-x" type="button">${ICO.copy}Copy table</button>`;
   tw.before(bar);const cnt=$('.tt-n',bar);
   const apply=()=>{const ws=st.q.toLowerCase().split(/\s+/).filter(Boolean);let shown=0;
    rows.forEach(r=>{const ok=!ws.length||ws.every(w=>r.textContent.toLowerCase().includes(w));r.hidden=!ok;if(ok)shown++;});
@@ -202,16 +217,24 @@ function enhanceTables(){
   if(sortable)[...last.cells].forEach((th,i)=>{th.classList.add('sortable');const b=document.createElement('button');b.type='button';b.innerHTML=th.innerHTML;b.title='Sort by '+thTxt(th);th.innerHTML='';th.append(b);
    b.addEventListener('click',e=>{e.stopPropagation();if(st.col!==i){st.col=i;st.dir=1;}else st.dir=st.dir===1?-1:st.dir===-1?0:1;sortNow();});});
   const fi=$('input',bar);if(fi){fi.addEventListener('input',()=>{st.q=fi.value;apply();});fi.addEventListener('keydown',e=>{if(e.key==='Escape'&&fi.value){e.stopPropagation();fi.value='';st.q='';apply();}});}
-  $('.tt-b',bar).addEventListener('click',()=>{const vis=rows.filter(r=>!r.hidden);
+  $('.tt-s',bar).addEventListener('click',()=>{const r=rows.find(x=>x.classList.contains('hi')&&!x.hidden)||null;
+   if(!r){toast('Click a row (or pick an NPS at the top) to choose what to send.');return;}
+   const hd=sortable?[...last.cells].map(thTxt):[...r.cells].map((_,i)=>{const h=hRows.length?[...hRows[hRows.length-1].cells][i]:null;return h?thTxt(h):'Col '+(i+1);});
+   const vals=[...r.cells].map(cellTxt);
+   const title=[(panel&&$('.phead h1',panel)||{}).textContent,ctxOf(tw,panel)].filter(Boolean).map(t=>t.trim()).filter((t,i,a)=>a.indexOf(t)===i).join(' – ');
+   const segs=panel?$$('.seg button[aria-pressed="true"]',panel).filter(b=>!b.closest('#unitSeg')).map(b=>b.textContent.trim()).filter(t=>t&&!/^(section|3d|table|drawing|plan|elevation|sketch|view|chart)$/i.test(t)).map(t=>/^(150|300|400|600|900|1500|2500)$/.test(t)?'Class '+t:t):[];
+   const sub=[...segs,`${hd[0]||'Size'} ${vals[0]}`,unitNow()?'units '+unitNow():''].filter(Boolean).join(' · ');
+   shareChat({title,sub,rows:hd.slice(1).map((h,i)=>[h,vals[i+1]]).filter(r=>r[1]&&!/^[—–-]$/.test(r[1])),note:'Check against the current edition of the standard.'});});
+  $('.tt-x',bar).addEventListener('click',()=>{const vis=rows.filter(r=>!r.hidden);
    const head=sortable?[[...last.cells].map(thTxt)]:hRows.map(r=>[...r.cells].flatMap(c=>[thTxt(c),...Array(Math.max(0,c.colSpan-1)).fill('')]));
    const tsv=[...head,...vis.map(r=>[...r.cells].map(cellTxt))].map(r=>r.join('\t')).join('\n');
    const sec=panel&&$('.phead h1,.phead h2',panel);copy(tsv,`Copied ${vis.length} rows${sec?' from '+sec.textContent.trim():''}. Paste into Excel.`);});
   apply();sortNow();});}
-let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;enhanceTables();dimAll();});};
+let raf=0;const schedule=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;enhanceTables();dimAll();shareLabels();});};
 new MutationObserver(schedule).observe($('#main'),{childList:true,subtree:true});
 
 /* ---------- start ---------- */
-pageBar();enhanceTables();dimAll();
+pageBar();enhanceTables();dimAll();shareLabels();document.addEventListener('click',()=>setTimeout(shareLabels,0));
 if(location.hash){const t=document.getElementById(location.hash.slice(1));if(t)requestAnimationFrame(()=>t.scrollIntoView({block:'start'}));}
 })();
 document.documentElement.classList.add('js-ready');

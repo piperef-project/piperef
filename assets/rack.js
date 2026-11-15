@@ -357,7 +357,7 @@ function drawOut(){
  <div class="rk-sum"><div><span>Rack width</span><b>${fm(R.W)} ${uL()}</b></div><div><span>Tiers</span><b>${R.tiers.length}</b></div><div><span>Top tier, TOS</span><b>${fm(R.tiers[R.tiers.length-1].el)} ${uL()}</b></div><div><span>Lines</span><b>${c.P} P · ${c.U} U · ${c.F} FW</b></div><div><span>Future space</span><b>${R.pct}%</b></div></div>
  ${R.W>R.maxW?`<p class="note" style="margin:0 0 10px">One line is wider than the ${R.maxW/1000} m limit on its own, so the rack is wider than the limit. Consider a two-bay rack.</p>`:''}
  <div class="rk-draw">${toSVG(R)}</div>
- <div class="rk-dl"><span class="lbl" style="font-size:13px;font-weight:600">Download drawing</span>${seg('rkFmt',[['pdf','PDF'],['dxf','DXF for AutoCAD']],S.fmt||'pdf')}<button class="rk-b pri" type="button" id="rkDl">Download</button><small>${(S.fmt||'pdf')==='pdf'?'A3 sheet with line schedule and title block.':'Opens in AutoCAD, BricsCAD and others; use Save As to make a DWG. Model space in mm.'}</small></div>
+ <div class="rk-dl"><span class="lbl" style="font-size:13px;font-weight:600">Download drawing</span>${seg('rkFmt',[['pdf','PDF'],['dxf','DXF for AutoCAD']],S.fmt||'pdf')}<button class="rk-b pri" type="button" id="rkDl">Download</button><button class="chat-b" type="button" id="rkChat">Copy for chat</button><small>${(S.fmt||'pdf')==='pdf'?'A3 sheet with line schedule and title block.':'Opens in AutoCAD, BricsCAD and others; use Save As to make a DWG. Model space in mm.'}</small></div>
  <ul class="rk-tiers">${R.tiers.map(tierLine).join('')}</ul>
  <h3 style="margin:18px 0 8px;font-size:16px">Line schedule</h3>
  ${tbl(['No.','Line','Size','Class','Ins. mm','Type','Tier',`From left column, ${uL()}`],rows)}
@@ -373,6 +373,7 @@ function drawOut(){
   <li>Electrical and instrument trays sit at opposite ends with ${EI_SEP} mm or more between them; ${TRAY_GAP} mm between trays.</li>
   <li>This is a preliminary width for layout. Confirm with the stress, civil and electrical disciplines and your project specification.</li></ul>`;
  bindSeg('rkFmt',v=>{S.fmt=v;save();drawOut();});
+ const cb=out.querySelector('#rkChat');if(cb&&window.shareChat)cb.onclick=()=>window.shareChat({title:'Pipe rack, preliminary sizing',sub:`${R.ls.length} lines · ${c.P} process · ${c.U} utility · ${c.F} fire water · future ${R.pct}%`,rows:[['Rack width (column c/c)',`${fm(R.W)} ${uL()}`],...R.tiers.map(t=>[`Tier ${t.i+1}, TOS EL +${fm(t.el)} ${uL()}`,t.kind==='T'?`${+S.nE||0} electrical + ${+S.nI||0} instrument trays, ${S.tw} mm`:`${t.lines.length} ${t.kind==='U'?'utility':'process'} lines, future ${fm(Math.max(0,t.fut[1]-t.fut[0]))} ${uL()}`])],note:'Preliminary width for layout; confirm with stress, civil and electrical.'});
  out.querySelector('#rkDl').onclick=()=>{const f=S.fmt||'pdf';try{dl(f==='pdf'?toPDF(LAST):toDXF(LAST),`pipe-rack-section.${f}`);}catch(e){console.error(e);}};}
 
 function bindShell(){

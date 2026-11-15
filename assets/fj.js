@@ -141,7 +141,7 @@ function render(){
   <label>Nut factor K<input id="fjK" type="number" min="0.08" max="0.3" step="0.01" value="${S.k}"></label>
  </div>
  <div class="fj-box"><div class="fj-views"><figure><figcaption>Section through the joint (upper half)</figcaption>${section(r,fm)}</figure><figure><figcaption>Flange face, bolt numbering</figcaption>${face(r)}</figure></div>
-  <div class="fj-sum"><span>NPS ${n} · Class ${S.cls}</span><span>${r.N} × <b>${r.thr}</b> studs</span><span>Stud length <b>${fm(r.L)}</b></span><span>Gasket <b>${fm(r.g.t)}</b> → about ${fm(r.g.c)} compressed</span><span>Target torque <b>${nm(Tn)} N·m</b> (${nm(r.T)} ft·lb)</span></div></div>
+  <div class="fj-sum"><span>NPS ${n} · Class ${S.cls}</span><span>${r.N} × <b>${r.thr}</b> studs</span><span>Stud length <b>${fm(r.L)}</b></span><span>Gasket <b>${fm(r.g.t)}</b> → about ${fm(r.g.c)} compressed</span><span>Target torque <b>${nm(Tn)} N·m</b> (${nm(r.T)} ft·lb)</span><button class="chat-b" id="fjChat" type="button">Copy for chat</button></div></div>
  <div class="fj-out">
   <div class="fj-card"><h3>Bolt length</h3>
    ${tb(['Part','Value'],[...r.parts.map(([t,v])=>`<tr><td style="text-align:left">${t}</td><td>${fm(v)}</td></tr>`),`<tr><td style="text-align:left"><b>Calculated</b></td><td><b>${fm(r.Lc)}</b></td></tr>`,`<tr><td style="text-align:left"><b>Stud length, rounded up to 5 mm</b></td><td><b>${fm(r.L)}</b></td></tr>`])}
@@ -182,7 +182,8 @@ function render(){
   <li>ASME B16.5: flange thickness, bolt circle, bolt count and size; raised face 1.6 mm included in thickness for Class 150 and 300, 6.4 mm added for Class 400 and up.</li>
   <li>ASME B16.20 (spiral wound) and B16.21 (non-metallic sheet) gaskets. ASME B1.1 thread stress area. ASTM A193 / A320 / A194 bolting.</li>
   <li>Same stud length build-up as the <a href="calculators.html">Bolt length calculator</a>; flange sizes from the <a href="flanges.html">Flanges page</a>.</li></ul></div>`;
- bind();}
+ bind();
+ const cb=P.querySelector('#fjChat');if(cb&&window.shareChat)cb.onclick=()=>window.shareChat({title:'Flange joint, ASME B16.5 WN RF',sub:`NPS ${n} · Class ${S.cls} · ${GK[S.gk].n}`,rows:[['Stud bolts',`${r.N} × ${r.thr} × ${Math.round(r.L)} mm, ${BM[S.bm].n}, 2 heavy hex nuts each`],['Gasket',`${fm(r.g.t)} as supplied, about ${fm(r.g.c)} compressed`],['Gap at raised faces',fm(r.gapRF)],['Gap at flange rims',fm(r.gapRim)],['Target torque',`${nm(Tn)} N·m (${nm(r.T)} ft·lb), K ${r.K}, ${S.pct}% of yield`],['Passes','30% → 60% → 100% cross pattern, then 100% clockwise until nuts stop'],['Tightening order',sq.join('-')]],note:'Torque is an estimate for planning; the joint procedure and gasket maker set the final value.'});}
 function keep(f){const y=scrollY;f();render();scrollTo(0,y);}
 function bind(){
  const on=(id,k,key)=>{const e=P.querySelector('#'+id);e.addEventListener(e.tagName==='SELECT'?'change':'change',()=>keep(()=>{S[k]=e.value;sv(key,e.value);}));};

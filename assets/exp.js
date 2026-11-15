@@ -156,7 +156,7 @@ function render(){
  P.innerHTML=head+ctrl+`
  <div class="ex-box"><div class="ex-draw">${S.ty==='u'?drawU(r,fm):drawL(r,fm)}</div>
   <div class="ex-sum"><div><span>Thermal growth</span><b>${fm(r.dT)}</b></div><div><span>${S.ty==='u'?'Loop height H':'Short leg, minimum'}</span><b>${fm(r.H)}</b></div>${S.ty!=='l'?`<div><span>Loop width W</span><b>${fm(r.W)}</b></div>`:''}<div><span>Extra pipe</span><b>${fm(r.extra)}</b></div><div><span>Force on anchors, approx.</span><b>${IN()?Math.round(r.F*224.8).toLocaleString('en-US')+' lbf':r.F.toFixed(1)+' kN'}</b></div></div></div>
- <p class="ex-pre ex-pre-s" role="note">Preliminary values. Confirm with the stress analysis before issuing drawings or ordering.</p>
+ <p class="ex-pre ex-pre-s" role="note">Preliminary values. Confirm with the stress analysis before issuing drawings or ordering. <button class="chat-b" id="exChat" type="button">Copy for chat</button></p>
  <div class="ex-out">
   <div class="ex-card"><h3>Thermal growth</h3>${rows([
    [`Expansion of ${M.e==='cs'?'carbon steel':'austenitic stainless'} from ${tShow(S.tam)} to ${tShow(S.top)} ${tU()}`,IN()?`${(r.emm*30.48/25.4).toFixed(2)} in/100 ft`:`${r.emm.toFixed(2)} mm/m`],
@@ -183,7 +183,8 @@ function render(){
   <li>ASME B31.3: allowable displacement stress range (para. 302.3.5), thermal expansion (Table C-1), modulus of elasticity (Table C-6), basic allowable stress (Table A-1).</li>
   <li>Guided cantilever method: M.W. Kellogg, <i>Design of Piping Systems</i>; L = √(3 E D Δ / S<sub>A</sub>).</li>
   <li>Values are interpolated from the tables as published; check them against the edition your project uses.</li></ul></div>`;
- bind();}
+ bind();
+ const cb=P.querySelector('#exChat');if(cb&&window.shareChat)cb.onclick=()=>window.shareChat({title:`Expansion ${S.ty==='u'?'U-loop':'L-bend'}, preliminary`,sub:`NPS ${n} Sch ${r.sch} · ${M.n} · ${tShow(S.tam)} to ${tShow(S.top)} ${tU()}`,rows:[[S.ty==='u'?'Anchor to anchor':'Long leg',fmL(r.Lm)],['Thermal growth',fm(r.dT)],...(S.ty==='u'?[['Loop height H',fm(r.H)],['Loop width W',fm(r.W)]]:[['Short leg, minimum',fm(r.H)]]),['Extra pipe',fm(r.extra)],['Anchor force, approx.',IN()?Math.round(r.F*224.8)+' lbf':r.F.toFixed(1)+' kN'],['Bending stress',`${Math.round(r.sig/r.SA*100)}% of SA`]],note:'Preliminary, guided cantilever method. Stress analysis is still required.'});}
 function bind(){
  const y=()=>scrollY,keep=f=>{const s=y();f();render();scrollTo(0,s);};
  bindSeg('exTy',v=>keep(()=>{S.ty=v;sv('ex_ty',v);}));

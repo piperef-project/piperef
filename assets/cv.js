@@ -444,7 +444,7 @@ function render(){
  </div>
  ${inRange?'':`<p class="note" style="margin:-4px 0 12px">NPS ${SEL} is outside the ${v.n} range here, so NPS ${n} is shown.</p>`}
  <div class="cv-box"><div class="cv-views"><figure><figcaption>Front view</figcaption>${ACT_SVG(ST,vals)}</figure><figure><figcaption>Side view, along the pipe</figcaption>${ACT_SIDE(ST,vals)}</figure></div>
-  <div class="cv-sum"><b>${v.n}</b><span>NPS ${n} · ${clsLbl(CLS)}${OPT?` · ${v.opt.n.replace(/ \(.*\)/,'')} ${OPT}`:''} · values in ${LU()}</span></div></div>
+  <div class="cv-sum"><b>${v.n}</b><span>NPS ${n} · ${clsLbl(CLS)}${OPT?` · ${v.opt.n.replace(/ \(.*\)/,'')} ${OPT}`:''} · values in ${LU()}</span><button class="chat-b" id="cvChat" type="button">Copy for chat</button></div></div>
  <div class="cv-out"><div>${tbl(['Dim.','What it is','Value'],[...rows,...extra])}
   <p class="cv-src">Sources: ${used.map(srcLink).join(' · ')}</p>
   ${d._c?`<details class="cv-calc" open><summary>How these values were worked out (NPS ${n}, ${clsLbl(CLS)}, in mm)</summary>
@@ -454,6 +454,7 @@ function render(){
   ${v.id==='safe'?RULES[ST==='esv'?'esv':'globe']:''}
   <p class="note" style="margin-top:12px">${v.id==='safe'?'Safe-side values are deliberately generous so a layout made with them still fits the final valve. Replace them with the vendor\'s certified GA drawing once the valve is bought.':'"See vendor GA" means the vendor does not publish that dimension in a table; take it from the vendor\'s GA drawing. Values are for early layout.'}${v.opt?' The actuator size comes from the vendor\'s sizing for your duty.':''}</p></div></div>`;
  bind(v);
+ const cb=P.querySelector('#cvChat');if(cb&&window.shareChat)cb.onclick=()=>window.shareChat({title:`Control valve, ${(STY.find(x=>x[0]===ST)||[,''])[1]}`,sub:`${v.n} · NPS ${n} · ${clsLbl(CLS)}${OPT?` · ${OPT}`:''}`,rows:[...Object.keys(WHAT).filter(k=>d[k]).map(k=>[`${k}, ${((WHAT_BY[ST]||{})[k]||WHAT[k]).replace(/<[^>]+>/g,'')}`,d[k][0]==null?'See vendor GA':`${fmt(d[k][0])} ${LU()}`]),...d._x.map(([t,x,,raw])=>[t,raw?x:`${fmt(x)} ${LU()}`])],note:v.id==='safe'?'Safe-side preliminary values for layout. Replace with the vendor GA drawing.':'Preliminary, from published vendor data. Confirm with the vendor GA drawing.'});
 }
 function keep(f){const y=scrollY;f();render();scrollTo(0,y);}
 function bind(v){

@@ -846,3 +846,14 @@ font[style*="background-color"]{background:none!important;box-shadow:none!import
 @media (max-width:640px){.icobtn.lang-b #langCode{display:none}.icobtn.lang-b{width:40px;padding:0;justify-content:center}.lang-menu{position:fixed;left:12px;right:12px;top:62px;width:auto}}
 
 @media (max-width:420px){.top-ctrls{gap:6px}#npsSel{width:94px;min-width:0}.icobtn.lang-b{width:38px}}
+
+.tt-s{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--rule-strong))}.tt-s:hover{color:var(--accent);border-color:var(--accent)}
+
+
+/* copy for chat button on calculator pages */
+.chat-b{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--rule-strong));border-radius:var(--r-sm);background:var(--sheet);color:var(--accent);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;margin-left:auto}
+.chat-b::before{content:"";width:15px;height:15px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.8%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 5h16v11H9l-5 4z%27/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.8%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 5h16v11H9l-5 4z%27/%3E%3C/svg%3E") center/contain no-repeat}
+.chat-b:hover{border-color:var(--accent)}
+.ex-pre .chat-b{margin-left:10px;height:28px;vertical-align:middle}
+
+@media (max-width:560px){.ctrls,.ctrl{max-width:100%;min-width:0}.ctrls .seg{flex-wrap:wrap;max-width:100%;height:auto}.ctrls .seg button{flex:1 1 auto}}
