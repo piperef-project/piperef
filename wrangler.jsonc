@@ -7,7 +7,7 @@
   "compatibility_date": "2026-11-01",
   "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
   "d1_databases": [
-    { "binding": "DB", "database_name": "piperef", "database_id": "REPLACE_WITH_D1_DATABASE_ID", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "piperef", "database_id": "2d5a3e57-7917-4d93-9e80-b26b77079cb8", "migrations_dir": "migrations" }
   ],
   "routes": [
     { "pattern": "api.piperef.site", "custom_domain": true },
@@ -15,8 +15,8 @@
   ],
   "vars": {
     "SITE_ORIGINS": "https://piperef.site,https://www.piperef.site",
-    "ACCESS_TEAM_DOMAIN": "REPLACE_WITH_TEAM.cloudflareaccess.com",
-    "ACCESS_AUD": "REPLACE_WITH_ACCESS_APPLICATION_AUD",
+    "ACCESS_TEAM_DOMAIN": "piperef.cloudflareaccess.com",
+    "ACCESS_AUD": "1fe17a34dac98d8ff70883b49ff0a9956f801906c6781dde5f78eff77f1e45c0",
     "ADMIN_HOST": "admin.piperef.site"
   },
   "observability": { "enabled": true }
