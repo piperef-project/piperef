@@ -828,3 +828,21 @@ details>summary{color:var(--ink-2)}
 @media (max-width:640px){.cf-grid{grid-template-columns:1fr}}
 html:not(.js-ready) .foot{visibility:hidden}
 #p-cv,#p-rack,#p-fj{min-height:calc(100vh - var(--top))}
+
+/* language picker + machine translation */
+.lang{position:relative}
+.icobtn.lang-b{width:auto;padding:0 9px;gap:5px;display:inline-flex;align-items:center;font:inherit;font-size:12.5px;font-weight:650;letter-spacing:.02em}
+.lang-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:60;width:260px;max-height:min(70vh,520px);overflow:auto;background:var(--sheet);border:1px solid var(--rule-strong);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.16);padding:6px}
+.lang-menu p{margin:4px 8px 8px;font-size:12px;color:var(--muted);line-height:1.4}
+.lang-menu button{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;border:0;background:none;color:var(--ink);font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;cursor:pointer;text-align:left}
+.lang-menu button small{color:var(--muted);font-size:12px}
+.lang-menu button:hover,.lang-menu button:focus-visible{background:var(--paper-2);outline:none}
+.lang-menu button[aria-checked=true]{background:rgba(24,73,169,.1);color:var(--accent);font-weight:650}
+.lang-menu hr{border:0;border-top:1px solid var(--rule);margin:6px 4px}
+.lang-note{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--sheet);font-size:13px;padding:9px 14px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:calc(100vw - 32px)}
+.gtranslate_wrapper,#goog-gt-tt,.goog-te-balloon-frame,iframe.skiptranslate,.VIpgJd-ZVi9od-ORHb-OEVmcd,.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,.VIpgJd-yAWNEb-L7lbkb{display:none!important}
+body{top:0!important}
+font[style*="background-color"]{background:none!important;box-shadow:none!important}
+@media (max-width:640px){.icobtn.lang-b #langCode{display:none}.icobtn.lang-b{width:40px;padding:0;justify-content:center}.lang-menu{position:fixed;left:12px;right:12px;top:62px;width:auto}}
+
+@media (max-width:420px){.top-ctrls{gap:6px}#npsSel{width:94px;min-width:0}.icobtn.lang-b{width:38px}}

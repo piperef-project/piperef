@@ -215,3 +215,48 @@ pageBar();enhanceTables();dimAll();
 if(location.hash){const t=document.getElementById(location.hash.slice(1));if(t)requestAnimationFrame(()=>t.scrollIntoView({block:'start'}));}
 })();
 document.documentElement.classList.add('js-ready');
+
+/* Translate the whole site with GTranslate (Google machine translation), loaded only when a language other than English is picked.
+   The choice is kept, so every page opens in that language. Drawings, sizes and the brand stay untranslated. */
+(()=>{
+const L=[['en','English','English'],['hi','हिन्दी','Hindi'],['te','తెలుగు','Telugu'],['ta','தமிழ்','Tamil'],['kn','ಕನ್ನಡ','Kannada'],['ml','മലയാളം','Malayalam'],['mr','मराठी','Marathi'],['bn','বাংলা','Bengali'],['gu','ગુજરાતી','Gujarati'],['ur','اردو','Urdu'],
+ ['ar','العربية','Arabic'],['fr','Français','French'],['es','Español','Spanish'],['pt','Português','Portuguese'],['de','Deutsch','German'],['it','Italiano','Italian'],['pl','Polski','Polish'],['ru','Русский','Russian'],['tr','Türkçe','Turkish'],
+ ['zh-CN','中文（简体）','Chinese'],['ja','日本語','Japanese'],['ko','한국어','Korean'],['id','Bahasa Indonesia','Indonesian'],['vi','Tiếng Việt','Vietnamese'],['th','ไทย','Thai'],['fa','فارسی','Persian']];
+const btn=document.getElementById('langBtn'),menu=document.getElementById('langMenu');if(!btn||!menu)return;
+const KEY='pr_lang',get=()=>{try{return localStorage.getItem(KEY)||'en'}catch(e){return'en'}},put=v=>{try{v==='en'?localStorage.removeItem(KEY):localStorage.setItem(KEY,v)}catch(e){}};
+let cur=get();
+const code=c=>c==='zh-CN'?'中文':c.toUpperCase();
+const show=()=>{const l=L.find(x=>x[0]===cur)||L[0];document.getElementById('langCode').textContent=code(l[0]);btn.setAttribute('aria-label','Language: '+l[2]);};
+menu.innerHTML='<p>Machine translation by Google, through GTranslate. Sizes, numbers and drawings stay as they are; check anything important against the English page.</p>'+
+ L.map((l,i)=>(i===1?'<hr>':i===10?'<hr>':'')+`<button type="button" role="menuitemradio" data-l="${l[0]}" aria-checked="${l[0]===cur}" lang="${l[0]}"><span>${l[1]}</span><small>${l[0]==='en'?'Original':l[2]}</small></button>`).join('');
+/* keep drawings, code, sizes and the brand out of translation, including content drawn later */
+const keep=root=>{(root.querySelectorAll?root:document).querySelectorAll('svg,code,kbd,.top-brand,#npsSel,.notr').forEach(e=>{e.classList.add('notranslate');e.setAttribute('translate','no');});};
+let mo=null;const guard=()=>{keep(document);if(mo)return;mo=new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(n=>{if(n.nodeType!==1)return;if(n.tagName==='svg'||n.tagName==='SVG'){n.classList.add('notranslate');n.setAttribute('translate','no');}else keep(n);});});mo.observe(document.body,{childList:true,subtree:true});};
+const note=t=>{let n=document.querySelector('.lang-note');if(!n){n=document.createElement('div');n.className='lang-note';n.setAttribute('role','status');document.body.appendChild(n);}n.textContent=t;clearTimeout(note.t);note.t=setTimeout(()=>n.remove(),5000);};
+let loading=null;
+function load(){if(loading)return loading;guard();
+ const w=document.createElement('div');w.className='gtranslate_wrapper';w.setAttribute('aria-hidden','true');document.body.appendChild(w);
+ window.gtranslateSettings={default_language:'en',languages:L.map(l=>l[0]),wrapper_selector:'.gtranslate_wrapper',native_language_names:true,detect_browser_language:false};
+ loading=new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.gtranslate.net/widgets/latest/dropdown.js';s.defer=true;s.onload=()=>ok();s.onerror=()=>no();document.head.appendChild(s);});
+ return loading;}
+function go(l){
+ const pair='en|'+l,ready=()=>typeof window.doGTranslate==='function'||document.querySelector('.gtranslate_wrapper select');
+ let tries=0;const t=setInterval(()=>{if(ready()){clearInterval(t);
+   if(typeof window.doGTranslate==='function')window.doGTranslate(pair);else{const s=document.querySelector('.gtranslate_wrapper select');s.value=pair;s.dispatchEvent(new Event('change'));}}
+  else if(++tries>60){clearInterval(t);note('Translation could not start. Check your connection or ad blocker and try again.');}},100);}
+function pick(l){cur=l;put(l);show();menu.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.l===l)));close();
+ document.documentElement.lang=l;
+ if(l==='en'){if(loading){go('en');}return;}
+ load().then(()=>go(l)).catch(()=>note('Translation could not load. Check your connection or ad blocker and try again.'));}
+const open=()=>{menu.hidden=false;btn.setAttribute('aria-expanded','true');(menu.querySelector('[aria-checked=true]')||menu.querySelector('button')).focus();};
+const close=()=>{menu.hidden=true;btn.setAttribute('aria-expanded','false');};
+btn.addEventListener('click',e=>{e.stopPropagation();menu.hidden?open():close();});
+menu.addEventListener('click',e=>{const b=e.target.closest('button[data-l]');if(b)pick(b.dataset.l);});
+menu.addEventListener('keydown',e=>{const bs=[...menu.querySelectorAll('button')],i=bs.indexOf(document.activeElement);
+ if(e.key==='ArrowDown'){e.preventDefault();bs[(i+1)%bs.length].focus();}else if(e.key==='ArrowUp'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus();}
+ else if(e.key==='Escape'){close();btn.focus();}});
+document.addEventListener('click',e=>{if(!menu.hidden&&!e.target.closest('.lang'))close();});
+show();
+/* a saved language: translate this page too */
+if(cur!=='en'){document.documentElement.lang=cur;load().then(()=>go(cur)).catch(()=>{});}
+})();
