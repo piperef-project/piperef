@@ -47,7 +47,10 @@ function pageBar(){const k=document.body.dataset.page;if(k==='home'||$('.pagebar
  const chips=std&&std!=='All tables'?std.split(' / ').map(s=>`<span class="std-chip"><i></i>${/^(B|PFI)/.test(s)?'ASME ':''}${esc(s)}</span>`).join(''):'';
  const bar=document.createElement('div');bar.className='pagebar';
  bar.innerHTML=`<ol class="crumbs" aria-label="Breadcrumb"><li><a href="index.html">Home</a></li>${g&&g!==lbl?`<li><span>${esc(g)}</span></li>`:''}<li><span aria-current="page">${esc(lbl)}</span></li></ol><div class="stds" aria-label="Governing standards">${chips}</div>`;
- $('#main').prepend(bar);}
+ $('#main').prepend(bar);
+ /* data version chip, from the correction log */
+ const add=()=>fetch('assets/corrections.json').then(r=>r.ok?r.json():null).then(j=>{const v=j&&j.datasets&&j.datasets[k];if(!v)return;const st=$('.stds',bar);if(!st||$('.ver-chip',st))return;const a=document.createElement('a');a.className='std-chip ver-chip';a.href='contact.html#data-versions';a.title='Data version of this page. Updated '+v.date+'. See the correction history.';a.innerHTML=`<i></i>Data v${esc(v.v)}`;st.append(a);}).catch(()=>{});
+ ('requestIdleCallback' in window)?requestIdleCallback(add,{timeout:3000}):setTimeout(add,1500);}
 
 /* ---------- search index ---------- */
 const KW={size:'line size summary everything one sheet',pipe:'od outside diameter wall thickness id inside diameter schedule weight kg/m b36.10 b36.19 pipe id flow area',

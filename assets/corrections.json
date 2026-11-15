@@ -1,0 +1,91 @@
+{
+ "_readme": "Correction log for piperef.site. Statuses: submitted, review, verified, closed. Raise the dataset version (v) and date when a verified correction changes data.",
+ "updated": "2026-11-15",
+ "datasets": {
+  "size": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "pipe": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "flange": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "fj": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "bw": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "sw": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "gasket": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "blind": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "pt": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "span": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "sup": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "spc": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "vdim": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "cv": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "valve": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "rack": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "exp": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "acc": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "shoe": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "eqck": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  },
+  "calc": {
+   "v": "1.0",
+   "date": "2026-11-15"
+  }
+ },
+ "items": []
+}

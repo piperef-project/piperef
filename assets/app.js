@@ -278,7 +278,7 @@ function renderTabs(){
  const sc=document.getElementById('sideContact');if(sc)sc.setAttribute('aria-current',TAB==='contact'?'page':'false');
  document.querySelectorAll('.panel').forEach(p=>{p.hidden=p.dataset.tab!==TAB;if(!p.hidden&&PREV_TAB&&PREV_TAB!==TAB){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}});
  document.querySelectorAll('.refs').forEach(r=>r.hidden=r.dataset.for!==TAB);
- PREV_TAB=TAB;if(TAB==='iso')loadIso();if(TAB==='cv'&&!window.__cvLoaded){window.__cvLoaded=1;import('./cv.js?v=20261115i').catch(()=>{const p=document.getElementById('p-cv');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='exp'&&!window.__expLoaded){window.__expLoaded=1;import('./exp.js?v=20261115i').catch(()=>{const p=document.getElementById('p-exp');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='fj'&&!window.__fjLoaded){window.__fjLoaded=1;import('./fj.js?v=20261115i').catch(()=>{const p=document.getElementById('p-fj');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='rack'&&!window.__rackLoaded){window.__rackLoaded=1;import('./rack.js?v=20261115i').catch(()=>{const p=document.getElementById('p-rack');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='sup'&&!window.__supLoaded){window.__supLoaded=1;import('./supports.js?v=20261115i').catch(()=>{const p=document.getElementById('p-sup');if(p)p.innerHTML='<div class="phead"><div><h1>Pipe supports</h1><p>The 3D viewer could not load in this browser.</p></div></div>';});}if(typeof M3!=='undefined')M3.redrawAll();}
+ PREV_TAB=TAB;if(TAB==='iso')loadIso();if(TAB==='cv'&&!window.__cvLoaded){window.__cvLoaded=1;import('./cv.js?v=20261115j').catch(()=>{const p=document.getElementById('p-cv');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='contact'&&!window.__corrLoaded){window.__corrLoaded=1;import('./corr.js?v=20261115j').catch(()=>{});}if(TAB==='exp'&&!window.__expLoaded){window.__expLoaded=1;import('./exp.js?v=20261115j').catch(()=>{const p=document.getElementById('p-exp');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='fj'&&!window.__fjLoaded){window.__fjLoaded=1;import('./fj.js?v=20261115j').catch(()=>{const p=document.getElementById('p-fj');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='rack'&&!window.__rackLoaded){window.__rackLoaded=1;import('./rack.js?v=20261115j').catch(()=>{const p=document.getElementById('p-rack');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='sup'&&!window.__supLoaded){window.__supLoaded=1;import('./supports.js?v=20261115j').catch(()=>{const p=document.getElementById('p-sup');if(p)p.innerHTML='<div class="phead"><div><h1>Pipe supports</h1><p>The 3D viewer could not load in this browser.</p></div></div>';});}if(typeof M3!=='undefined')M3.redrawAll();}
 function loadIso(){const f=document.getElementById('isoFrame');if(!f||f.getAttribute('src'))return;f.src=f.dataset.src;}
 $('#tabs').addEventListener('click',e=>{const a=e.target.closest('a[data-t]');if(!a)return;if(a.dataset.t===TAB){e.preventDefault();window.scrollTo({top:0});}});
 
@@ -2714,9 +2714,10 @@ $('#thBtn').addEventListener('click',()=>applyTheme(document.documentElement.dat
     if(!f.message.value.trim()){say('Please write a message.','err');f.message.focus();return;}
     if(f.email.value&&!f.email.checkValidity()){say('That email address looks incomplete.','err');f.email.focus();return;}
     if(f.botcheck.checked) return;
-    const type=f.type.value, pg=f.page.value.trim();
+    const type=f.type.value, pg=f.page.value.trim(), cx=window.__corr?window.__corr.fields(type):{};
     const data={access_key:WEB3FORMS_KEY,from_name:'Pipe Ref website',
-      subject:`Pipe Ref ${type.toLowerCase()}${type==='Correction'&&pg?': '+pg:''}`,
+      subject:`Pipe Ref ${type.toLowerCase()}${cx.reference_no?' '+cx.reference_no:''}${type==='Correction'&&pg?': '+pg:''}${cx.data_version?' (data '+cx.data_version.split(' ')[0]+')':''}`,
+      ...cx,
       type, name:f.name.value.trim()||'(not given)', email:f.email.value.trim()||'(not given)',
       ...(type==='Correction'?{page:pg||'(not given)',reference:f.reference.value.trim()||'(not given)'}:{}),
       message:f.message.value.trim(), sent_from:location.href};
@@ -2725,7 +2726,7 @@ $('#thBtn').addEventListener('click',()=>applyTheme(document.documentElement.dat
     try{
       const r=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)});
       const j=await r.json().catch(()=>({}));
-      if(r.ok&&j.success){f.reset();setType();say('Thanks — your message has been sent.','ok');}
+      if(r.ok&&j.success){const ref=window.__corr?window.__corr.sent(type):'';f.reset();setType();say(ref?`Sent. Your reference is ${ref}. Keep it to track this ${type==='Correction'?'correction':'message'} below.`:'Thanks — your message has been sent.','ok');}
       else throw new Error(j.message||r.status);
     }catch(err){say('Could not send right now. Please email contact.piperef@gmail.com instead.','err');}
     finally{btn.disabled=false;}
