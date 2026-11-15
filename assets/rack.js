@@ -66,7 +66,7 @@ const catOf=l=>l.cat&&l.cat!=='auto'?l.cat:autoCat(l.name);
 const EX=[['Crude feed','12','300',50],['Product to storage','8','150',40],['Flare header','24','150',0],['Sour water','4','150',0],['Lean amine','6','300',0],['Slop oil','3','150',40],
  ['LP steam','10','150',75],['MP steam','6','300',75],['Steam condensate','4','150',40],['Cooling water supply','16','150',0],['Cooling water return','16','150',0],
  ['Instrument air','3','150',0],['Plant air','2','150',0],['Nitrogen','2','150',0],['Fuel gas','4','150',0],['Boiler feed water','4','600',40],['Fire water','12','150',0]];
-const DEF={lines:[],fw:'rack',tray:'yes',nE:2,nI:1,tw:'600',fut:'25',futC:'',el1:6000,maxW:'10000'};
+const DEF={lines:[],fw:'rack',tray:'yes',nE:2,nI:1,tw:'600',fut:'25',futC:'',el1:6000,maxW:'10000',fins:'yes'};
 let S;try{S=Object.assign({},DEF,JSON.parse(store.get('rack','null'))||{});}catch(e){S=Object.assign({},DEF);}
 if(!Array.isArray(S.lines))S.lines=[];
 let uid=S.lines.reduce((m,l)=>Math.max(m,l.id||0),0);
@@ -78,10 +78,11 @@ if(!S.lines.length&&store.get('rack',null)==null)S.lines=EX.map(e=>newLine(...e)
 const COL=300,EDGE=100,GAP=25,FGAP=25,TRAY_GAP=150,EI_SEP=300,BEAM=300,TIER_MIN=1500;
 const up=(x,s)=>Math.ceil(x/s-1e-9)*s;
 const shoeH=ins=>ins>0?Math.max(100,up(ins+25,50)):0;
-function prep(l){const od=odmm(l.nps),ins=+l.ins||0,f=flOD(l.cls,l.nps)||0;
- return Object.assign({},l,{od,ins,f,env:Math.max(od/2+ins,f/2),c:catOf(l),shoe:shoeH(ins)});}
+function prep(l){const od=odmm(l.nps),ins=+l.ins||0,f=flOD(l.cls,l.nps)||0,fr=f?f/2+(S.fins==='yes'?ins:0):0;
+ return Object.assign({},l,{od,ins,f,fr,env:Math.max(od/2+ins,fr),c:catOf(l),shoe:shoeH(ins)});}
 /* centre-to-centre of two neighbours: pipe/insulation to pipe/insulation, or a flange to the other line's pipe/insulation (flanges staggered) */
-const cc=(a,b)=>up(Math.max(a.od/2+a.ins+b.od/2+b.ins+GAP,a.f?a.f/2+b.od/2+b.ins+FGAP:0,b.f?b.f/2+a.od/2+a.ins+FGAP:0),10);
+/* fr = flange radius, plus the line's insulation when flanges are insulated or boxed */
+const cc=(a,b)=>up(Math.max(a.od/2+a.ins+b.od/2+b.ins+GAP,a.fr?a.fr+b.od/2+b.ins+FGAP:0,b.fr?b.fr+a.od/2+a.ins+FGAP:0),10);
 const futPct=()=>{const v=S.fut==='c'?+S.futC:+S.fut;return isFinite(v)&&v>=0?Math.min(v,200):0;};
 
 /* split one tier's lines into the left and right column sides: forced edge lines first, then biggest lines to the lighter side */
@@ -219,7 +220,7 @@ function sheet(R){
    .forEach((v,i)=>tx(X(sx+cols[i]+1),Y(y+rh*0.3),v,fs));ln(X(sx),Y(y),X(405),Y(y),'FRAME','hair');});
  /* notes */
  let ny=45;const notes=[`1. DIMENSIONS IN MM. ELEVATIONS ARE TOP OF STEEL (TOS) FROM GRADE.`,`2. FUTURE SPACE ${R.pct}% OF THE WIDTH THE LINES NEED, ROUNDED TO THE NEXT 500 MM.`,
-  `3. LINE C/C = OD/2 + INS + OD/2 + INS + 25, OR FLANGE OD/2 + OD/2 + INS + 25 (FLANGES STAGGERED).`,`4. PRELIMINARY. CHECK LOADS, STRESS AND PROJECT SPECIFICATION BEFORE ISSUE.`];
+  `3. LINE C/C = OD/2 + INS + OD/2 + INS + 25, OR FLANGE OD/2 ${S.fins==='yes'?'+ INS ':''}+ OD/2 + INS + 25 (FLANGES STAGGERED).`,`4. PRELIMINARY. CHECK LOADS, STRESS AND PROJECT SPECIFICATION BEFORE ISSUE.`];
  if(R.tiers.some(t=>t.kind==='T'))notes.push(`5. CABLE TRAYS: E = ELECTRICAL, I = INSTRUMENT, ${S.tw} MM WIDE.`);
  notes.forEach(s=>{tx(X(15),Y(ny),s,1.9);ny-=3.2;});ny-=0;
  if(R.ug.length){tx(X(15),Y(ny),`FIRE WATER UNDERGROUND, NOT ON RACK: ${R.ug.map(l=>l.no).join(', ')}`,1.9);}
@@ -335,9 +336,11 @@ function drawOpt(){
  <label class="wide"><span>Future space <small>share of the width the lines need</small></span>${seg('rkFut',[['10','10%'],['20','20%'],['25','25%'],['30','30%'],['c','Other']],S.fut)}</label>
  ${S.fut==='c'?`<label>Future space, %<input type="number" min="0" max="200" step="5" id="rkFutC" value="${S.futC}" placeholder="e.g. 35"></label>`:''}
  <label>First tier elevation, mm <small>top of steel from grade</small><input type="number" min="2000" max="20000" step="100" id="rkEl" value="${S.el1}"></label>
+ <label><span>Flanges on insulated lines <small>insulated or boxed flanges add the insulation to the flange OD</small></span>${seg('rkFins',[['yes','Insulated'],['no','Bare']],S.fins)}</label>
  <label>Widest rack allowed <small>more lines go to another tier</small><select id="rkMax">${[6000,8000,10000,12000,15000].map(v=>`<option value="${v}"${String(v)===String(S.maxW)?' selected':''}>${v/1000} m</option>`).join('')}</select></label>`;
  bindSeg('rkTray',v=>{S.tray=v;save();drawOpt();drawOut();});
  bindSeg('rkFw',v=>{S.fw=v;save();drawOpt();drawOut();});
+ bindSeg('rkFins',v=>{S.fins=v;save();drawOpt();drawOut();});
  bindSeg('rkFut',v=>{S.fut=v;save();drawOpt();drawOut();});
  [['rkNE','nE'],['rkNI','nI'],['rkTW','tw'],['rkFutC','futC'],['rkEl','el1'],['rkMax','maxW']].forEach(([id,k])=>{const e=o.querySelector('#'+id);if(e)e.addEventListener(e.tagName==='SELECT'?'change':'input',()=>{S[k]=e.tagName==='SELECT'?e.value:(e.value===''?'':+e.value);save();drawOut();});});}
 
@@ -362,8 +365,8 @@ function drawOut(){
  <ul class="rk-rules">
   <li>Process lines go on the lower tier(s), utility lines above them and cable trays on the top tier. Fire water sits on the lowest tier next to a column. Flare and relief lines go on the top pipe tier at the outside, so they can slope without pockets.</li>
   <li>Larger lines go next to the columns, smaller ones towards the middle. Future space is kept in the middle of each tier.</li>
-  <li>Centre-to-centre of neighbours = the larger of pipe or insulation to pipe or insulation + ${GAP} mm, and flange OD/2 to the next pipe or insulation + ${FGAP} mm (flanges staggered). Flange OD from ASME B16.5, and B16.47 Series A above NPS 24.</li>
-  <li>Outermost line: ${EDGE} mm from the column face to the flange or insulation. Columns taken as ${COL} mm wide.</li>
+  <li>Centre-to-centre of neighbours = the larger of pipe or insulation to pipe or insulation + ${GAP} mm, and flange OD/2 (+ the line's insulation when flanges are insulated) to the next pipe or insulation + ${FGAP} mm (flanges staggered). Flange OD from ASME B16.5, and B16.47 Series A above NPS 24.</li>
+  <li>Outermost line: ${EDGE} mm from the column face to the outside of the insulation or the (insulated) flange, whichever sticks out more. Columns taken as ${COL} mm wide.</li>
   <li>Insulated lines sit on shoes: 100 mm, or the insulation + 25 mm rounded up to 50.</li>
   <li>Width a tier needs × (1 + future %), then the widest tier is rounded up to 500 mm. When a tier would be wider than the limit you chose, lines move to another tier.</li>
   <li>Tier spacing = 1500 mm, or the largest line of the two tiers + 750 mm for branch turns, whichever is more, in 250 mm steps.</li>
