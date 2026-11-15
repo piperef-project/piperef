@@ -1,0 +1,23 @@
+{
+  // Pipe Ref correction API + admin page.
+  // api.piperef.site   -> public endpoints (submit, track, history)
+  // admin.piperef.site -> admin page and admin endpoints, behind Cloudflare Access
+  "name": "piperef-admin",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "piperef", "database_id": "REPLACE_WITH_D1_DATABASE_ID", "migrations_dir": "migrations" }
+  ],
+  "routes": [
+    { "pattern": "api.piperef.site", "custom_domain": true },
+    { "pattern": "admin.piperef.site", "custom_domain": true }
+  ],
+  "vars": {
+    "SITE_ORIGINS": "https://piperef.site,https://www.piperef.site",
+    "ACCESS_TEAM_DOMAIN": "REPLACE_WITH_TEAM.cloudflareaccess.com",
+    "ACCESS_AUD": "REPLACE_WITH_ACCESS_APPLICATION_AUD",
+    "ADMIN_HOST": "admin.piperef.site"
+  },
+  "observability": { "enabled": true }
+}

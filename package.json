@@ -1,0 +1,10 @@
+{
+  "name": "piperef-admin",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "migrate:local": "wrangler d1 migrations apply piperef --local",
+    "deploy": "wrangler d1 migrations apply piperef --remote && wrangler deploy"
+  },
+  "devDependencies": { "wrangler": "^4" }
+}
