@@ -278,7 +278,7 @@ function renderTabs(){
  const sc=document.getElementById('sideContact');if(sc)sc.setAttribute('aria-current',TAB==='contact'?'page':'false');const sa=document.getElementById('sideAbout');if(sa)sa.setAttribute('aria-current',TAB==='about'?'page':'false');
  document.querySelectorAll('.panel').forEach(p=>{p.hidden=p.dataset.tab!==TAB;if(!p.hidden&&PREV_TAB&&PREV_TAB!==TAB){p.classList.remove('enter');void p.offsetWidth;p.classList.add('enter');}});
  document.querySelectorAll('.refs').forEach(r=>r.hidden=r.dataset.for!==TAB);
- PREV_TAB=TAB;if(TAB==='iso')loadIso();if(TAB==='cv'&&!window.__cvLoaded){window.__cvLoaded=1;import('./cv.js?v=20261116b').catch(()=>{const p=document.getElementById('p-cv');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='contact'&&!window.__corrLoaded){window.__corrLoaded=1;import('./corr.js?v=20261116b').catch(()=>{});}if(TAB==='pid'&&!window.__pidLoaded){window.__pidLoaded=1;import('./pid.js?v=20261116b').catch(()=>{const p=document.getElementById('p-pid');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='exp'&&!window.__expLoaded){window.__expLoaded=1;import('./exp.js?v=20261116b').catch(()=>{const p=document.getElementById('p-exp');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='fj'&&!window.__fjLoaded){window.__fjLoaded=1;import('./fj.js?v=20261116b').catch(()=>{const p=document.getElementById('p-fj');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='mto'&&!window.__mtoLoaded){window.__mtoLoaded=1;import('./mto.js?v=20261116b').catch(()=>{const p=document.getElementById('p-mto');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='rack'&&!window.__rackLoaded){window.__rackLoaded=1;import('./rack.js?v=20261116b').catch(()=>{const p=document.getElementById('p-rack');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='sup'&&!window.__supLoaded){window.__supLoaded=1;import('./supports.js?v=20261116b').catch(()=>{const p=document.getElementById('p-sup');if(p)p.innerHTML='<div class="phead"><div><h1>Pipe supports</h1><p>The 3D viewer could not load in this browser.</p></div></div>';});}if(typeof M3!=='undefined')M3.redrawAll();}
+ PREV_TAB=TAB;if(TAB==='iso')loadIso();if(TAB==='cv'&&!window.__cvLoaded){window.__cvLoaded=1;import('./cv.js?v=20261116c').catch(()=>{const p=document.getElementById('p-cv');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='contact'&&!window.__corrLoaded){window.__corrLoaded=1;import('./corr.js?v=20261116c').catch(()=>{});}if(TAB==='pid'&&!window.__pidLoaded){window.__pidLoaded=1;import('./pid.js?v=20261116c').catch(()=>{const p=document.getElementById('p-pid');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='exp'&&!window.__expLoaded){window.__expLoaded=1;import('./exp.js?v=20261116c').catch(()=>{const p=document.getElementById('p-exp');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='fj'&&!window.__fjLoaded){window.__fjLoaded=1;import('./fj.js?v=20261116c').catch(()=>{const p=document.getElementById('p-fj');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='mto'&&!window.__mtoLoaded){window.__mtoLoaded=1;import('./mto.js?v=20261116c').catch(()=>{const p=document.getElementById('p-mto');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='rack'&&!window.__rackLoaded){window.__rackLoaded=1;import('./rack.js?v=20261116c').catch(()=>{const p=document.getElementById('p-rack');if(p)p.insertAdjacentHTML('beforeend','<p class="note">This page could not load in this browser.</p>');});}if(TAB==='sup'&&!window.__supLoaded){window.__supLoaded=1;import('./supports.js?v=20261116c').catch(()=>{const p=document.getElementById('p-sup');if(p)p.innerHTML='<div class="phead"><div><h1>Pipe supports</h1><p>The 3D viewer could not load in this browser.</p></div></div>';});}if(typeof M3!=='undefined')M3.redrawAll();}
 function loadIso(){const f=document.getElementById('isoFrame');if(!f||f.getAttribute('src'))return;f.src=f.dataset.src;}
 $('#tabs').addEventListener('click',e=>{const a=e.target.closest('a[data-t]');if(!a)return;if(a.dataset.t===TAB){e.preventDefault();window.scrollTo({top:0});}});
 
@@ -1387,7 +1387,7 @@ const sizeOpts=(list,cur)=>list.map(n=>`<option${n===cur?' selected':''}>${n}</o
 function renderCalc(){
  $('#p-calc').innerHTML=`<div class="phead"><div><h1>Design calculators</h1><p>Quick checks for everyday layout work. Inputs are in mm, bar and °C; results show both unit systems where useful.</p></div></div>
  <div class="calcs">
-  <div class="calc" id="c-wall"><h3>Pipe wall thickness · B31.3</h3><p>Straight pipe under internal pressure, Eq. (3a): t = PD / 2(SEW + PY).</p>
+  <div class="calc" id="c-wall"><h3>Pipe wall thickness · B31.3</h3><a class="vf-link" href="#vf-c-wall">How this is calculated</a><p>Straight pipe under internal pressure, Eq. (3a): t = PD / 2(SEW + PY).</p>
    <div class="eq-custom" style="margin:0;font-size:12.5px"><b>Enter S, E, W and Y from your governing B31.3 edition.</b> Allowable stress depends on the exact material specification, grade, product form and design temperature (Table A-1M / A-1). E comes from Table A-1B, W from para. 302.3.5, Y from Table 304.1.1. This tool supplies no allowable stresses; the result is a check on the values you enter.</div>
    <div class="fg">
     <label>NPS<select class="sel" id="w-n">${sizeOpts(PIPE.map(p=>p[0]).filter(n=>n!=='1/8'),SEL)}</select></label>
@@ -1403,23 +1403,23 @@ function renderCalc(){
     <label>Mill tolerance, %<input class="inp" id="w-t" type="number" step="0.5" value="12.5"></label>
    </div><div class="out" id="w-out"></div></div>
 
-  <div class="calc" id="c-pt"><h3>Flange class selection · B16.5</h3><p>Interpolates the rating of the material group you pick at your design temperature.</p>
+  <div class="calc" id="c-pt"><h3>Flange class selection · B16.5</h3><a class="vf-link" href="#vf-c-pt">How this is calculated</a><p>Interpolates the rating of the material group you pick at your design temperature.</p>
    <div class="fg"><label>Material group<select class="sel" id="pt-g">${Object.keys(PTG).map(k=>`<option value="${k}"${k===PTGRP?' selected':''}>${PTG[k].lbl}</option>`).join('')}</select></label><label>Design temperature, °C<input class="inp" id="pt-t" type="number" value="250"></label><label>Design pressure, bar(g)<input class="inp" id="pt-p" type="number" step="0.1" value="40"></label></div>
    <div class="out" id="pt-out"></div></div>
 
-  <div class="calc" id="c-elb"><h3>Elbow take-off</h3><p>Centre-to-end for any bend angle: A = R × tan(θ/2). Use it for cut elbows and odd-angle routing.</p>
+  <div class="calc" id="c-elb"><h3>Elbow take-off</h3><a class="vf-link" href="#vf-c-elb">How this is calculated</a><p>Centre-to-end for any bend angle: A = R × tan(θ/2). Use it for cut elbows and odd-angle routing.</p>
    <div class="fg"><label>NPS<select class="sel" id="e-n">${sizeOpts(BWN,BWN.includes(SEL)?SEL:'4')}</select></label>
     <label>Angle θ, degrees<input class="inp" id="e-a" type="number" step="1" value="60"></label>
     <label>Radius<select class="sel" id="e-r"><option value="lr">LR (1.5D)</option><option value="sr">SR (1D)</option><option value="3d">3D</option><option value="5d">5D</option></select></label></div>
    <div class="out" id="e-out"></div></div>
 
-  <div class="calc" id="c-off"><h3>Rolling offset</h3><p>Travel and run for an offset that rises and rolls at the same time, using fittings of angle θ.</p>
+  <div class="calc" id="c-off"><h3>Rolling offset</h3><a class="vf-link" href="#vf-c-off">How this is calculated</a><p>Travel and run for an offset that rises and rolls at the same time, using fittings of angle θ.</p>
    <div class="fg"><label>Set (vertical), mm<input class="inp" id="o-s" type="number" value="600"></label><label>Roll (horizontal), mm<input class="inp" id="o-r" type="number" value="450"></label>
     <label>Fitting angle θ<select class="sel" id="o-a"><option>45</option><option>60</option><option>30</option><option>22.5</option><option>90</option></select></label>
     <label>NPS (LR elbows)<select class="sel" id="o-n">${sizeOpts(BWN,BWN.includes(SEL)?SEL:'4')}</select></label></div>
    <div class="out" id="o-out"></div></div>
 
-  <div class="calc" id="c-slope"><h3>Pipe slope</h3><p>Solve for drop, slope or run length. Elevations and lengths in mm; enter slope in any unit and get all the others.</p>
+  <div class="calc" id="c-slope"><h3>Pipe slope</h3><a class="vf-link" href="#vf-c-slope">How this is calculated</a><p>Solve for drop, slope or run length. Elevations and lengths in mm; enter slope in any unit and get all the others.</p>
    <div class="fg">
     <label>Solve for<select class="sel" id="sl-m"><option value="drop">Drop &amp; end EL</option><option value="slope">Slope</option><option value="len">Horizontal length</option></select></label>
     <label>Horizontal length L, mm<input class="inp" id="sl-l" type="number" step="any" value="12000"></label>
@@ -1429,7 +1429,7 @@ function renderCalc(){
     <label>End EL, mm<input class="inp" id="sl-e2" type="number" step="any" value="104880"></label>
    </div><div class="out" id="sl-out"></div></div>
 
-  <div class="calc" id="c-bolt"><h3>Bolt length · B16.5 flanges</h3><p>Stud or machine bolt length for a raised-face flange joint. Flange data comes from the B16.5 table; edit gasket and extras to suit the joint.</p>
+  <div class="calc" id="c-bolt"><h3>Bolt length · B16.5 flanges</h3><a class="vf-link" href="#vf-c-bolt">How this is calculated</a><p>Stud or machine bolt length for a raised-face flange joint. Flange data comes from the B16.5 table; edit gasket and extras to suit the joint.</p>
    <div class="fg">
     <label>Bolt type<select class="sel" id="b-t">
      <option value="stud">Stud bolt, 2 heavy hex nuts</option>
@@ -1448,13 +1448,13 @@ function renderCalc(){
     <label>Round up to<select class="sel" id="b-r"><option value="5">5 mm</option><option value="10">10 mm</option><option value="6.35">¼ inch</option></select></label>
    </div><div class="out" id="b-out"></div></div>
 
-  <div class="calc" id="c-sp"><h3>Line spacing on a rack</h3><p>Centre-to-centre of two adjacent lines, assuming flanges are not staggered. Clearance is kept between the flange of one line and the insulated OD of the other.</p>
+  <div class="calc" id="c-sp"><h3>Line spacing on a rack</h3><a class="vf-link" href="#vf-c-sp">How this is calculated</a><p>Centre-to-centre of two adjacent lines, assuming flanges are not staggered. Clearance is kept between the flange of one line and the insulated OD of the other.</p>
    <div class="fg"><label>Line A NPS<select class="sel" id="s-na">${sizeOpts(N20,'6')}</select></label><label>Line A class<select class="sel" id="s-ca">${sizeOpts(CLASSES,'300')}</select></label><label>Line A insulation, mm<input class="inp" id="s-ia" type="number" value="50"></label>
     <label>Line B NPS<select class="sel" id="s-nb">${sizeOpts(N20,'4')}</select></label><label>Line B class<select class="sel" id="s-cb">${sizeOpts(CLASSES,'150')}</select></label><label>Line B insulation, mm<input class="inp" id="s-ib" type="number" value="0"></label>
     <label>Clearance, mm<input class="inp" id="s-cl" type="number" value="25"></label></div>
    <div class="out" id="s-out"></div></div>
 
-  <div class="calc" id="c-cv"><h3>Unit converter</h3><p>Length, pressure and temperature.</p>
+  <div class="calc" id="c-cv"><h3>Unit converter</h3><a class="vf-link" href="#vf-c-cv">How this is calculated</a><p>Length, pressure and temperature.</p>
    <div class="fg"><label>Value<input class="inp" id="v-x" type="number" step="any" value="1"></label>
     <label>From<select class="sel" id="v-u"><option value="in">inch</option><option value="mm">mm</option><option value="ft">ft</option><option value="m">m</option><option value="bar">bar</option><option value="psi">psi</option><option value="MPa">MPa</option><option value="kgcm">kg/cm²</option><option value="C">°C</option><option value="F">°F</option></select></label></div>
    <div class="out" id="v-out"></div></div>

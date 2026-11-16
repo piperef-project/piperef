@@ -287,3 +287,8 @@ show();
 /* a saved language: translate this page too */
 if(cur!=='en'){document.documentElement.lang=cur;load().then(()=>go(cur)).catch(()=>{});}
 })();
+
+/* calculation verification: open the right block when its link is used */
+(function(){const op=h=>{if(!h||!/^#vf-/.test(h))return;const d=document.querySelector(h);if(d&&d.tagName==='DETAILS'){d.open=true;setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'start'}),30);}};
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#vf-"]');if(a){e.preventDefault();history.replaceState(null,'',a.getAttribute('href'));op(a.getAttribute('href'));}});
+if(location.hash)window.addEventListener('load',()=>op(location.hash));})();
