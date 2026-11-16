@@ -62,7 +62,7 @@ const KW={size:'line size summary everything one sheet',pipe:'od outside diamete
  vdim:'valve face to face b16.10 api 609 butterfly gate globe check ball handwheel stem height',pid:'p&id pid symbols legend valve symbol instrument bubble isa tag letters abbreviations line number gate globe check psv control valve pump exchanger',exp:'expansion loop thermal expansion growth u loop l bend offset guided cantilever anchor stress range flexibility',fj:'flange joint assembly bolt length stud length gasket thickness flange gap bolt torque tightening sequence star cross pattern pcc-1 bolt up',mto:'mto material take off bill of material bom pipe fittings flanges valves gaskets stud bolts random length',rack:'pipe rack width calculator tiers process utility fire water cable tray future space section drawing pdf dxf dwg',cv:'control valve actuator dimensions pneumatic diaphragm positioner electro pneumatic e/p motorised motorized electric actuator esv esdv shutdown valve scotch yoke spring return solenoid limit switch',valve:'valve access operability handwheel height reach f1166',
  shoe:'shoe support spool minimum spool length bolt removal clearance stud pipe support',acc:'access maintenance escape route crane road lift clearance',
  eqck:'equipment vendor drawing datasheet nozzle checklist verify',calc:'calculator wall thickness b31.3 flange class bolt length rolling offset slope elbow take-off unit converter pipe id',
- iso:'isometric iso compare revision pdf pcf ifc',contact:'email feedback correction report value'};
+ iso:'isometric iso compare revision pdf pcf ifc',contact:'email feedback correction report value',about:'about who built pipe ref author data source privacy disclaimer'};
 const CALCS=[['c-wall','Pipe wall thickness','B31.3 Eq. 3a, t = PD / 2(SEW + PY)','wall thickness pressure design b31.3 pipe id'],['c-pt','Flange class selection','B16.5 Groups 1.1, 2.1, 2.2, interpolated at temperature','flange class rating pressure temperature'],
  ['c-elb','Elbow take-off','A = R × tan(θ/2) for any bend angle','elbow take off cut angle'],['c-off','Rolling offset','Travel and run with fittings of angle θ','rolling offset travel run'],
  ['c-slope','Pipe slope','Drop, slope or run length','slope fall gradient drop'],['c-bolt','Bolt length','Stud or machine bolt for RF joints, B16.5','bolt stud length bolting removal clearance'],
@@ -70,7 +70,7 @@ const CALCS=[['c-wall','Pipe wall thickness','B31.3 Eq. 3a, t = PD / 2(SEW + PY)
 const ITEMS=[];
 NAV_GROUPS.forEach(([g,ks])=>ks.forEach(k=>ITEMS.push({k,t:(TABS.find(t=>t[0]===k)||[,k])[1],d:HOME_DESC[k]||'',s:TAB_STD[k]==='All tables'?'':TAB_STD[k]||'',g,href:PAGE[k],kw:KW[k]||'',ic:TAB_ICON[k]})));
 CALCS.forEach(([id,t,d,kw])=>ITEMS.push({k:'calc',t,d,s:'Calculator',g:'Calculators',href:'calculators.html#'+id,kw,ic:ICO.calc}));
-ITEMS.push({k:'contact',t:'Contact & corrections',d:HOME_DESC.contact||'',s:'',g:'Help',href:PAGE.contact,kw:KW.contact,ic:TAB_ICON.contact});
+ITEMS.push({k:'contact',t:'Contact & corrections',d:HOME_DESC.contact||'',s:'',g:'Help',href:PAGE.contact,kw:KW.contact,ic:TAB_ICON.contact});ITEMS.push({k:'about',t:'About Pipe Ref',d:HOME_DESC.about||'',s:'',g:'Help',href:PAGE.about,kw:KW.about,ic:TAB_ICON.about});
 
 /* ---------- query parsing ---------- */
 const SIZE_KEYS=PIPE.map(p=>p[0]);
