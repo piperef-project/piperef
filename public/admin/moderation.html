@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pipe Ref admin – moderation</title>
+<style>
+:root{--ink:#14202E;--ink2:#3A4A5E;--muted:#6B7A8D;--rule:#E1E6ED;--rule2:#C9D1DB;--paper:#F4F6F9;--sheet:#fff;--acc:#1849A9;--ok:#147A4A;--warn:#8A5A00;--bad:#B42318;--r:9px}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+header{display:flex;align-items:center;gap:14px;padding:12px 20px;background:var(--sheet);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:5}
+header b{font-size:16px}header .who{margin-left:auto;color:var(--muted);font-size:13px}
+main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,1fr);gap:18px;padding:18px 20px;max-width:1500px;margin:0 auto}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:14px 0 6px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.f{border:1px solid var(--rule2);background:var(--sheet);border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink2)}
+.f[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+input,select,textarea{font:inherit;font-size:14px;border:1px solid var(--rule2);border-radius:8px;padding:7px 9px;background:#fff;color:var(--ink);width:100%}
+textarea{min-height:64px;resize:vertical}
+.bar input{width:auto;flex:1 1 200px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th{font-size:12px;color:var(--muted);text-align:left;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--rule)}
+td{padding:8px;border-bottom:1px solid var(--rule);vertical-align:top}tbody tr{cursor:pointer}tbody tr:hover{background:#F7F9FC}tbody tr.on{background:#EAF0FB}
+.ref{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+.st{display:inline-block;font-size:12px;font-weight:650;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st.submitted{background:#EEF1F5;color:#46546A}.st.review{background:#FFF3D6;color:var(--warn)}.st.verified{background:#E2F3EA;color:var(--ok)}.st.closed{background:#EEF1F5;color:#46546A}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;margin:0}.kv dt{color:var(--muted)}.kv dd{margin:0;white-space:pre-wrap;word-break:break-word}
+.msg{background:#F7F9FC;border:1px solid var(--rule);border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word}
+.act{border:1px solid var(--rule);border-radius:10px;padding:12px;margin-top:10px}
+.act h4{margin:0 0 8px;font-size:13.5px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}.row label,.lab{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.btn{border:1px solid var(--rule2);background:#fff;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer;color:var(--ink)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.btn.bad{color:var(--bad);border-color:#F1C4BF}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 14px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}.toast.on{opacity:1}
+.hist{margin:0;padding-left:18px;font-size:13px}.muted{color:var(--muted)}
+details summary{cursor:pointer;font-weight:600}
+@media (max-width:980px){main{grid-template-columns:1fr}}
+
+main.mod{display:block;max-width:1100px}
+.item{border:1px solid var(--rule);border-radius:12px;background:var(--sheet);padding:14px 16px;margin-bottom:12px}
+.item h3{margin:0 0 4px;font-size:15px}.meta{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.item .msg{margin:6px 0}.tag{display:inline-block;font-size:11.5px;font-weight:650;padding:2px 8px;border-radius:99px;background:#EEF1F5;color:#46546A;margin-right:6px}
+.tag.thread{background:#EAF0FB;color:var(--acc)}.tag.reply{background:#F3EEFB;color:#5B3AA0}.tag.story{background:#FFF3D6;color:var(--warn)}
+.warn{background:#FFF8E6;border:1px solid #E9B949;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<header><b>Pipe Ref admin</b><a href="/admin/" style="font-size:13px">Corrections</a><b style="font-size:13px">Moderation</b><span class="who" id="who"></span></header>
+<main class="mod">
+ <div class="warn"><b>Before approving:</b> remove company, client, project and personal names, drawing numbers, and anything that could be confidential. Edit the text below, then approve. Reject spam and anything abusive.</div>
+ <div class="bar" id="filters"></div>
+ <div id="out"><p class="empty">Loading…</p></div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const TOP={general:'General',layout:'Piping layout',modelling:'3D modelling (S3D, E3D)',materials:'Materials and specs',stress:'Stress and supports',site:'Construction and site',careers:'Careers and industry'};
+let ST='pending',D=null;
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2200);};
+async function api(path,opt={}){const r=await fetch(path,{credentials:'same-origin',headers:{'content-type':'application/json'},...opt});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('Error '+r.status));return j;}
+function fields(kind,x){
+ if(kind==='thread')return `<label class="lab">Title<input data-f="title" value="${esc(x.title)}"></label><label class="lab">Topic<select data-f="topic">${Object.entries(TOP).map(([k,v])=>`<option value="${k}"${k===x.topic?' selected':''}>${v}</option>`).join('')}</select></label><label class="lab">Post<textarea data-f="body" rows="6">${esc(x.body)}</textarea></label>`;
+ if(kind==='reply')return `<label class="lab">Reply<textarea data-f="body" rows="4">${esc(x.body)}</textarea></label>`;
+ return `<label class="lab">Title<input data-f="title" value="${esc(x.title)}"></label><label class="lab">Type<select data-f="kind">${['rework','safety','quality','other'].map(k=>`<option${k===x.kind?' selected':''}>${k}</option>`).join('')}</select></label><label class="lab">Story<textarea data-f="story" rows="6">${esc(x.story)}</textarea></label><label class="lab">Lesson<textarea data-f="lesson" rows="3">${esc(x.lesson)}</textarea></label>`;}
+function card(kind,x){
+ const head=kind==='reply'?`Reply in: ${esc(x.thread_title)}`:esc(x.title);
+ return `<div class="item" data-k="${kind}" data-id="${x.id}"><h3><span class="tag ${kind}">${kind}</span>${head}</h3>
+  <div class="meta">${esc(x.name||'Anonymous')}${x.role?' · '+esc(x.role):''}${x.email?' · '+esc(x.email):''} · ${esc(x.created_at)} UTC${x.approved_at?' · approved '+esc(x.approved_at):''}</div>
+  ${fields(kind,x)}
+  <div class="btns" style="margin-top:10px">${ST!=='approved'?'<button class="btn ok" data-a="approved">Approve</button>':'<button class="btn" data-a="approved">Save edits</button>'}${ST!=='rejected'?'<button class="btn" data-a="rejected">Reject</button>':''}${ST!=='pending'?'<button class="btn" data-a="pending">Back to pending</button>':''}<button class="btn bad" data-a="delete">Delete</button></div></div>`;}
+function draw(){const p=D.pending;
+ $('#filters').innerHTML=[['pending',`Waiting (${p.t+p.r+p.s})`],['approved','Approved'],['rejected','Rejected']].map(([k,l])=>`<button class="f" data-s="${k}" aria-pressed="${ST===k}">${l}</button>`).join('');
+ const all=[...D.threads.map(x=>card('thread',x)),...D.replies.map(x=>card('reply',x)),...D.stories.map(x=>card('story',x))];
+ $('#out').innerHTML=all.length?all.join(''):'<p class="empty">Nothing here.</p>';}
+async function load(){try{D=await api('/api/admin/moderation?status='+ST);draw();}catch(e){$('#out').innerHTML=`<p class="empty">${esc(e.message)}</p>`;}}
+$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(!b)return;ST=b.dataset.s;load();});
+$('#out').addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;const it=b.closest('.item'),k=it.dataset.k,id=it.dataset.id,a=b.dataset.a;
+ try{if(a==='delete'){if(!confirm('Delete permanently?'))return;await api(`/api/admin/moderation/${k}/${id}`,{method:'DELETE'});toast('Deleted');}
+  else{const body={status:a};it.querySelectorAll('[data-f]').forEach(f=>body[f.dataset.f]=f.value);await api(`/api/admin/moderation/${k}/${id}`,{method:'PATCH',body:JSON.stringify(body)});toast(a==='approved'?'Approved and published':a==='rejected'?'Rejected':'Moved to pending');}
+  load();}catch(err){toast(err.message);}});
+api('/api/admin/me').then(j=>$('#who').textContent=j.email).catch(()=>{});
+load();
+</script>
+</body>
+</html>
