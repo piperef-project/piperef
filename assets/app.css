@@ -945,3 +945,8 @@ body:has(#p-pid:not([hidden])) .top-ctrls>.tc,body:has(#p-about:not([hidden])) .
 .fm-rbtn{font:inherit;font-size:12.5px;border:0;background:none;color:var(--accent);cursor:pointer;padding:2px 0}
 .fm-rslot .lf{margin-top:8px}
 @media (max-width:640px){.lf-grid{grid-template-columns:1fr}.ll-grid{grid-template-columns:1fr}}
+
+/* home hero: three.js flange over the canvas fallback */
+.hero-model .stage{position:relative}.hero-model .stage.h3d-on>canvas:not(.h3d){visibility:hidden}
+.hero-model .stage canvas.h3d{position:absolute;inset:0;width:100%!important;height:100%!important;display:block!important;cursor:grab;touch-action:pan-y;background:none}
+.hero-model .stage canvas.h3d:active{cursor:grabbing}
