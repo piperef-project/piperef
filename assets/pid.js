@@ -3,6 +3,8 @@
 (function(){
 const P=document.getElementById('p-pid');if(!P)return;
 if(!document.getElementById('pid-css')){const st=document.createElement('style');st.id='pid-css';st.textContent=`
+/* CAD and SVG downloads hidden for now (re-enable by removing this rule) */
+#p-pid [data-a="dxf"],#p-pid [data-a="dl"],#p-pid [data-a="cp"],#p-pid [data-x="dxf"],#p-pid .pd-dl small{display:none!important}
 #p-pid .pd-dl{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px;padding:10px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--sheet)}#p-pid .pd-dl small{flex-basis:100%;color:var(--muted);font-size:12px}#p-pid .pd-dl span{font-size:13px}
 #p-pid .pd-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 14px}
 #p-pid .pd-chip{border:1px solid var(--rule-strong);background:var(--sheet);color:var(--ink-2);border-radius:99px;padding:6px 13px;font:inherit;font-size:13px;font-weight:550;cursor:pointer}
@@ -408,7 +410,7 @@ function grid(){
   :`<p class="pd-empty">No symbol matches “${esc(Q)}”. Try a shorter word, like “valve” or “pump”.</p>`;}
 function render(){
  const count=k=>k==='all'?S.length:S.filter(o=>o.c===k).length;
- P.innerHTML=`<div class="phead"><div><h1>P&amp;ID symbols</h1><p>Over 200 common P&amp;ID legend symbols for lines, valves, fittings, instruments, equipment and fire &amp; safety, with ISA-5.1 tag letters, abbreviations and the line number format. Click a symbol for details or to download it as SVG, PNG or DXF (for AutoCAD).</p></div></div>
+ P.innerHTML=`<div class="phead"><div><h1>P&amp;ID symbols</h1><p>Over 200 common P&amp;ID legend symbols for lines, valves, fittings, instruments, equipment and fire &amp; safety, with ISA-5.1 tag letters, abbreviations and the line number format. Click a symbol for details or to download it as a PNG image.</p></div></div>
  <div class="pd-bar" role="toolbar" aria-label="Symbol groups">${[['all','All'],...CAT].map(([k,l])=>`<button class="pd-chip" type="button" data-c="${k}" aria-pressed="${CUR===k}">${l} <small>${count(k)}</small></button>`).join('')}
   <input class="pd-q" id="pdQ" type="search" placeholder="Search symbols, e.g. check valve, PSV, pump" aria-label="Search symbols" value="${esc(Q)}"></div>
  <div class="pd-dl" role="group" aria-label="Download symbols"><span>Download the <b id="pdDlN">${visible().length}</b> symbols shown:</span><button class="pd-btn pri" type="button" data-x="dxf">DXF block library (AutoCAD)</button><button class="pd-btn" type="button" data-x="png">PNG legend sheet</button><small>DXF opens in AutoCAD, BricsCAD and MicroStation; each symbol is a named block. Use Save As there to get a DWG.</small></div>
