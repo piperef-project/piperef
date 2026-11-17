@@ -50,6 +50,21 @@ function initKB(P){
  const h=location.hash;if(/^#q-/.test(h)){const d=P.querySelector(h);if(d){d.open=true;d.dataset.keep=1;setTimeout(()=>d.scrollIntoView({block:'start'}),60);}}
  P.querySelectorAll('.kb-perma').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();history.replaceState(null,'',a.getAttribute('href'));const u=location.href;navigator.clipboard&&navigator.clipboard.writeText(u).then(()=>{a.textContent='Link copied';setTimeout(()=>a.textContent='Link to this answer',1600);}).catch(()=>{});}));}
 
+/* ---------- glossary ---------- */
+function initGL(P){
+ const q=P.querySelector('#glQ');if(!q||P.__gl)return;P.__gl=1;
+ let T='all';const n=P.querySelector('#glN'),em=P.querySelector('#glEmpty'),az=P.querySelector('.gl-az');
+ const run=()=>{const s=q.value.trim().toLowerCase(),words=s.split(/\s+/).filter(Boolean);let c=0;
+  P.querySelectorAll('.gl-sec').forEach(sec=>{let k=0;
+   sec.querySelectorAll('.gl-e').forEach(e=>{const term=e.querySelector('b').textContent.toLowerCase(),txt=e.textContent.toLowerCase();
+    const ok=(T==='all'||e.dataset.t===T)&&words.every(w=>txt.includes(w));e.hidden=!ok;if(ok)k++;
+    e.classList.toggle('hit',!!s&&term===s);});
+   sec.hidden=!k;c+=k;const a=az&&az.querySelector('a[href="#'+sec.id+'"]');if(a)a.classList.toggle('off',!k);});
+  n.textContent=c+(c===1?' term':' terms');em.hidden=!!c;};
+ let tm;q.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(run,120);});
+ chipsBind(P.querySelector('.kb-chips'),'t',v=>{T=v;run();});
+ const h=location.hash;if(/^#g-/.test(h)){const e=P.querySelector(h);if(e){e.classList.add('hit');setTimeout(()=>e.scrollIntoView({block:'center'}),60);}}}
+
 /* ---------- lessons learned ---------- */
 async function initLessons(P){
  if(P.__ll)return;P.__ll=1;
@@ -98,6 +113,6 @@ function initForum(P){
  loadList();route();}
 
 window.renderLearn=()=>{const k=typeof TAB!=='undefined'?TAB:'';const P=document.getElementById('p-'+k);if(!P)return;
- if(k==='kb'||k==='iq')initKB(P);else if(k==='lessons')initLessons(P);else if(k==='forum')initForum(P);};
+ if(k==='kb'||k==='iq')initKB(P);else if(k==='gl')initGL(P);else if(k==='lessons')initLessons(P);else if(k==='forum')initForum(P);};
 window.renderLearn();
 })();
