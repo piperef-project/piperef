@@ -39,14 +39,14 @@ const chipsBind=(wrap,attr,fn)=>wrap&&wrap.addEventListener('click',e=>{const b=
 /* ---------- knowledge base ---------- */
 function initKB(P){
  const q=P.querySelector('#kbQ');if(!q||P.__kb)return;P.__kb=1;
- let T='all';const n=P.querySelector('#kbN'),em=P.querySelector('#kbEmpty');
+ let T='all',LVL='all';const n=P.querySelector('#kbN'),em=P.querySelector('#kbEmpty');
  const run=()=>{const s=q.value.trim().toLowerCase(),words=s.split(/\s+/).filter(Boolean);let c=0;
   P.querySelectorAll('.kb-sec').forEach(sec=>{let k=0;const tOk=T==='all'||sec.dataset.t===T;
-   sec.querySelectorAll('.kb-q').forEach(d=>{const txt=d.textContent.toLowerCase(),ok=tOk&&words.every(w=>txt.includes(w));d.hidden=!ok;if(ok)k++;if(words.length&&ok)d.open=true;else if(!words.length&&!d.dataset.keep)d.open=false;});
+   sec.querySelectorAll('.kb-q').forEach(d=>{const txt=d.textContent.toLowerCase(),ok=tOk&&(LVL==='all'||d.dataset.l===LVL)&&words.every(w=>txt.includes(w));d.hidden=!ok;if(ok)k++;if(words.length&&ok)d.open=true;else if(!words.length&&!d.dataset.keep)d.open=false;});
    sec.hidden=!k;c+=k;});
   n.textContent=c+(c===1?' answer':' answers');em.hidden=!!c;};
  let tm;q.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(run,120);});
- chipsBind(P.querySelector('.kb-chips'),'t',v=>{T=v;run();});
+ chipsBind(P.querySelector('.kb-chips:not(.iq-lvs)'),'t',v=>{T=v;run();});chipsBind(P.querySelector('.iq-lvs'),'l',v=>{LVL=v;run();});
  const h=location.hash;if(/^#q-/.test(h)){const d=P.querySelector(h);if(d){d.open=true;d.dataset.keep=1;setTimeout(()=>d.scrollIntoView({block:'start'}),60);}}
  P.querySelectorAll('.kb-perma').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();history.replaceState(null,'',a.getAttribute('href'));const u=location.href;navigator.clipboard&&navigator.clipboard.writeText(u).then(()=>{a.textContent='Link copied';setTimeout(()=>a.textContent='Link to this answer',1600);}).catch(()=>{});}));}
 
@@ -98,6 +98,6 @@ function initForum(P){
  loadList();route();}
 
 window.renderLearn=()=>{const k=typeof TAB!=='undefined'?TAB:'';const P=document.getElementById('p-'+k);if(!P)return;
- if(k==='kb')initKB(P);else if(k==='lessons')initLessons(P);else if(k==='forum')initForum(P);};
+ if(k==='kb'||k==='iq')initKB(P);else if(k==='lessons')initLessons(P);else if(k==='forum')initForum(P);};
 window.renderLearn();
 })();
