@@ -71,6 +71,7 @@ td{font-variant-numeric:tabular-nums}
 nav.tabs{flex:1;overflow-y:auto;padding:6px 10px 12px;scrollbar-width:thin;scrollbar-color:var(--rule-strong) transparent}
 .navgrp{padding-top:10px}
 .navh{margin:0;padding:4px 10px 4px;font-size:12px;font-weight:500;color:var(--muted)}
+button.navbtn{background:none;border:0;width:100%;font-family:inherit;cursor:pointer;text-align:left}
 .navbtn{display:flex;align-items:center;gap:10px;min-height:32px;padding:6px 10px;border-radius:var(--r-sm);color:var(--ink-2);text-decoration:none;font-size:13.5px;font-weight:450;line-height:1.25}
 .navbtn svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--muted);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .navbtn:hover{background:var(--paper);color:var(--ink)}
