@@ -229,7 +229,7 @@ function sheet(R){
  tx(X(278),Y(38.5),'PIPE RACK - TYPICAL CROSS SECTION',3.6,'start',1);
  tx(X(278),Y(26.5),`WIDTH ${R.W} MM  |  ${R.tiers.length} TIER${R.tiers.length===1?'':'S'}  |  ${R.ls.length} LINES`,2.6);
  tx(X(278),Y(14.5),`SCALE 1:${sc} (A3)`,2.6);tx(X(353),Y(14.5),new Date().toISOString().slice(0,10),2.6);
- tx(X(278),Y(5),'Generated with Pipe Ref (piperef.site) - preliminary sizing',1.8);
+ tx(X(278),Y(5),'Generated with Pipe Ref (piperef.net) - preliminary sizing',1.8);
  return {G,sc,ox,oy,W:420*k,H:297*k};}
 
 /* ------------------------------------------------------------ renderers */

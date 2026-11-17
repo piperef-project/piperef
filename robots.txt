@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://piperef.site/sitemap.xml
+Sitemap: https://piperef.net/sitemap.xml

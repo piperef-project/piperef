@@ -2,14 +2,14 @@
    Content for the knowledge base and typical cases is static HTML in the page; stories and discussions come from the API (moderated). */
 (function(){
 const API='https://api.piperef.site';
-const LIVE=/(^|\.)piperef\.site$/.test(location.hostname);
+const LIVE=/(^|\.)piperef\.(site|net)$/.test(location.hostname);
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const para=s=>esc(s).split(/\n{2,}/).map(p=>`<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
 const TOP={general:'General',layout:'Piping layout',modelling:'3D modelling (S3D, E3D)',materials:'Materials and specs',stress:'Stress and supports',site:'Construction and site',careers:'Careers and industry'};
 const KIND={rework:'Rework',safety:'Safety',quality:'Quality',other:'Other'};
 const fmtD=d=>{try{return new Date(d+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});}catch(e){return d;}};
 
-/* ---------- preview data (only off piperef.site, so the layout can be reviewed) ---------- */
+/* ---------- preview data (only off piperef.site / piperef.net, so the layout can be reviewed) ---------- */
 const MOCK={threads:[{id:1,topic:'layout',title:'Straight length before a pump suction when the vendor gives none?',body:'Preview example. What straight length do you keep before an end-suction centrifugal pump when the vendor drawing gives no requirement?',name:'Preview example',role:'Piping designer',date:'2026-11-16',replies:1,last:'2026-11-16'},
  {id:2,topic:'modelling',title:'Keeping insulation attributes right in the 3D model',body:'Preview example. How do you make sure insulation thickness in the model matches the line list after every revision?',name:'Preview example',role:'Piping lead',date:'2026-11-15',replies:0,last:'2026-11-15'}],
  replies:{1:[{id:1,parent:null,body:'Preview example reply. Many specifications ask for at least 5 pipe diameters, more for double-suction pumps; follow the pump standard and the vendor once data arrives.',name:'Preview example',role:'Rotating equipment',date:'2026-11-16'}]},

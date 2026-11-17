@@ -22,7 +22,7 @@ function copy(text,msg){const done=()=>toast(msg||`Copied ${text.length>40?'to c
 function copyRich(html,text,msg){const done=()=>toast(msg);
  try{if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})})]).then(done,()=>copy(text,msg));return;}}catch(e){}
  copy(text,msg);}
-const pageUrl=()=>'https://piperef.site'+location.pathname.replace(/\/index\.html$/,'/');
+const pageUrl=()=>'https://piperef.net'+location.pathname.replace(/\/index\.html$/,'/');
 const unitNow=()=>{const b=document.querySelector('#unitSeg button[aria-pressed="true"]');return b?b.textContent.trim():'';};
 /* share block: title, context line, label/value pairs. Pages call window.shareChat({title,sub,rows:[[k,v]],note}) */
 function shareChat(o){const rows=(o.rows||[]).filter(r=>r&&r[1]!=null&&String(r[1]).trim()!=='');
