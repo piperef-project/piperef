@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-18d',date:'18 Nov 2026',tag:'New tool',title:'Pipe cut length calculator',text:'Iso dimension minus fitting take-outs and weld gaps, with a cut list you can copy or print.',href:'cut-length.html'},
 {id:'2026-11-18b',date:'18 Nov 2026',tag:'New page',title:'Piping glossary',text:'395 piping terms and abbreviations, from FOT and BOP to FFW and PWHT, each linked to its page.',href:'glossary.html'},
 {id:'2026-11-18',date:'18 Nov 2026',tag:'Site',title:'Pipe Ref is now piperef.net',text:'Old piperef.site links still work and forward to the same page.',href:null},
 {id:'2026-11-17c',date:'17 Nov 2026',tag:'New page',title:'Piping interview questions',text:'106 questions with answers, from fresher to senior, filter by level and topic.',href:'interview-questions.html'},
