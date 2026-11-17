@@ -14,7 +14,7 @@
     { "pattern": "admin.piperef.site", "custom_domain": true }
   ],
   "vars": {
-    "SITE_ORIGINS": "https://piperef.site,https://www.piperef.site",
+    "SITE_ORIGINS": "https://piperef.net,https://www.piperef.net,https://piperef.site,https://www.piperef.site",
     "ACCESS_TEAM_DOMAIN": "piperef.cloudflareaccess.com",
     "ACCESS_AUD": "1fe17a34dac98d8ff70883b49ff0a9956f801906c6781dde5f78eff77f1e45c0",
     "ADMIN_HOST": "admin.piperef.site"

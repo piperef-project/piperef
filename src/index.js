@@ -319,7 +319,7 @@ export default {
         const r = new Response(a.body, a); r.headers.set('cache-control', 'no-store'); r.headers.set('x-robots-tag', 'noindex'); return r;
       }
       if (path === '/' && isAdminHost) return Response.redirect(new URL('/admin/', url).toString(), 302);
-      if (path === '/') return json({ service: 'Pipe Ref corrections API', site: 'https://piperef.site/contact.html' });
+      if (path === '/') return json({ service: 'Pipe Ref corrections API', site: 'https://piperef.net/contact.html' });
       return new Response('Not found', { status: 404 });
     } catch (e) {
       console.error(e);
