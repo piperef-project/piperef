@@ -24,7 +24,7 @@ panel.innerHTML=`<div class="phead"><div><h1>Pipe supports</h1><p>Common support
 
 /* ============================================================ catalogue
    dof order: down, up, sideways, along, turning · R held · P slides with friction · F free */
-const GROUPS={rest:'Rest',guide:'Guide & stop',anchor:'Anchor',hang:'Hanger',spring:'Spring',dyn:'Dynamic'};
+const GROUPS={rest:'Rest',guide:'Guide & stop',anchor:'Anchor',hang:'Hanger',spring:'Spring',dyn:'Strut & snubber',ej:'Expansion joint'};
 const SUP=[
  {id:'shoe',g:'rest',name:'Pipe shoe',type:null,dof:'RFPPF',fn:'A steel T welded under the pipe. It carries the weight and lifts insulated pipe clear of the beam so it can slide.',use:'Insulated lines on pipe racks and sleepers.'},
  {id:'clamped',g:'rest',name:'Clamped shoe',type:null,dof:'RFPPF',fn:'Does the same job as a shoe, but is bolted round the pipe instead of welded to it.',use:'Pipe that must not be welded: galvanised, lined or alloy pipe, or lines already in service.'},
@@ -32,18 +32,22 @@ const SUP=[
  {id:'ptfe',g:'rest',name:'Slide plate (PTFE)',type:35,dof:'RFPPF',fn:'A low-friction pad under the shoe lets the pipe slide with a much smaller friction force.',use:'Long hot lines and lines next to pumps and compressors.'},
  {id:'roll',g:'rest',name:'Pipe roll',type:44,dof:'RFRPF',fn:'A roller under the pipe turns as the pipe grows, giving long movement with very little friction.',use:'Long steam and hot oil lines.'},
  {id:'saddle',g:'rest',name:'Adjustable base support',type:38,dof:'RFPPF',fn:'A stanchion from the floor with a curved saddle on a screw, so the height can be set on site.',use:'Pump lines and lines close to grade.'},
- {id:'trunnion',g:'rest',name:'Trunnion (dummy leg)',type:null,dof:'RFPPF',fn:'A short pipe welded to an elbow reaches down to the steel where there is no beam under the pipe.',use:'Elbows at risers and changes in elevation.'},
+ {id:'trunnion',g:'rest',name:'Elbow trunnion (dummy leg)',type:null,dof:'RFPPF',fn:'A pipe leg welded to the back of an elbow, in line with the vertical leg, reaching down to the steel. It carries the riser’s weight where there is no beam under the pipe.',use:'Elbows at the bottom of risers and at changes in elevation.'},
+ {id:'trunnion_s',g:'rest',name:'Trunnion on straight pipe',type:null,dof:'RFPPF',fn:'A short pipe stub welded under a straight run, with a reinforcing pad, rests on the steel below. It lifts the line to the height needed or reaches steel that is lower than the pipe.',use:'Large or heavy lines, and straight runs that sit above the nearest steel.'},
  {id:'guide',g:'guide',name:'Guide',type:null,dof:'RFRPF',fn:'Angles each side of the shoe stop the pipe moving sideways but let it slide along its length.',use:'Straight runs and both sides of expansion loops.'},
  {id:'stop',g:'guide',name:'Line stop',type:null,dof:'RFFRF',fn:'Plates welded under the shoe straddle the beam flange, so the pipe cannot move along its axis.',use:'Splitting long runs and protecting equipment nozzles.'},
  {id:'ubolt',g:'guide',name:'U-bolt',type:24,dof:'RRRPF',fn:'A threaded U round the pipe, bolted through the beam. Holds the pipe down and sideways.',use:'Small, uninsulated utility lines.'},
  {id:'hold',g:'guide',name:'Hold-down',type:null,dof:'RRPPF',fn:'Z-shaped cleats welded to the beam lap over the shoe base plate, so the pipe cannot lift off but can still slide.',use:'Lines with uplift from heat, wind, surge or relief-valve thrust.'},
- {id:'anchor',g:'anchor',name:'Anchor',type:null,dof:'RRRRR',fn:'The shoe is bolted and welded to the steel, fixing the pipe in every direction.',use:'Fixed points that split a system for stress analysis.'},
+ {id:'anchor',g:'anchor',name:'Anchor',type:null,dof:'RRRRR',fn:'The shoe base plate is welded all round to the steel, fixing the pipe in every direction.',use:'Fixed points that split a system for stress analysis.'},
  {id:'clevis',g:'hang',name:'Clevis hanger',type:1,dof:'RFFFF',fn:'A U-shaped clevis on a threaded rod hangs the pipe from the steel above.',use:'Light lines under beams, slabs and racks.'},
  {id:'clamp',g:'hang',name:'Pipe clamp hanger',type:3,dof:'RFFFF',fn:'A bolted clamp round the pipe, hung on a rod. Stronger than a clevis and sits under the insulation.',use:'Heavier, hotter and insulated hanging lines.'},
  {id:'riser',g:'hang',name:'Riser clamp',type:42,dof:'RPRRF',fn:'Clamp bars on a vertical pipe rest on the steel; welded lugs above stop the pipe slipping through.',use:'Vertical lines through floors and platforms.'},
  {id:'var',g:'spring',name:'Variable spring hanger',type:51,dof:'RRFFF',fn:'A coil spring in a can carries the pipe while it moves up and down. The load changes a little with travel.',use:'Hot lines with vertical movement.'},
+ {id:'vbase',g:'spring',name:'Variable spring support',type:52,dof:'RRPPF',fn:'The same spring can as a hanger, but standing on the steel below and pushing up. The pipe shoe sits on a load flange on top of the spring.',use:'Hot lines with vertical movement where there is no steel above, such as lines close to grade or on equipment platforms.'},
  {id:'const',g:'spring',name:'Constant spring hanger',type:54,dof:'RRFFF',fn:'A spring and lever keep the support force almost the same through the whole travel.',use:'Large vertical movement, or lines near turbines and compressors.'},
+ {id:'strut',g:'dyn',name:'Rigid strut',type:null,tag:'Vendor item · sway strut',dof:'RRFFF',fn:'A stiff rod with a ball-joint eye at each end, pinned to a clamp on the pipe and a bracket on the steel. It holds the pipe in line with the strut, push or pull, and lets it swing a little the other ways.',use:'A frictionless restraint in one direction, for hot lines and lines near rotating equipment. Unlike a snubber it also holds slow thermal movement.'},
  {id:'snub',g:'dyn',name:'Snubber',type:47,dof:'FFRFF',fn:'Lets slow thermal movement through but locks against sudden shocks, like a car’s seat belt.',use:'Earthquake loads, water hammer and relief-valve discharge.'}
+ ,{id:'bellow',g:'ej',name:'Expansion bellows',type:null,tag:'Vendor item · EJMA',dof:null,key:'Blue arrow shows the movement the bellows takes up.',fn:'A thin, corrugated metal bellows between two flanges flexes to take up thermal growth, so the line needs no expansion loop. Pressure thrust tries to push it open, so the pipe either side needs main anchors and close guides. The limit rods stop it over-stretching if an anchor fails.',use:'Tight layouts with no room for a loop: large hot lines, turbine and fan ducts. Avoid where a loop fits, since bellows are a weak point in the line.'}
 ];
 
 /* ============================================================ renderer and scene */
@@ -144,11 +148,16 @@ const BUILD={
   nut(o,0,2.62,0,.3,.14);cyl(o,.46,.06,M.steel2,0,3.36,0);
   const yc=3.39+.3+R;band(o,R+.08,R,Math.PI*1.1,Math.PI*1.9,1.3,M.steel2,0,yc);
   for(const s of [-1,1])box(o,1.3,.36,.07,M.steel2,0,3.55,s*.32);pipe(o,6.4,{y:yc});restArrow(a,yc);},
- trunnion(o,a){ibeam(o,BEAM);const yc=3.3,br=1.55,xt=.42;
+ trunnion(o,a){const yc=3.3,br=1.55,lr=.7;ibeam(o,BEAM,{x:br});
   pipe(o,4.6,{x:-2.3,y:yc});const el=add(new THREE.TorusGeometry(br,R,28,56,Math.PI/2),M.pipe,o);el.rotation.z=-Math.PI/2;el.position.set(0,yc+br,0);
   pipe(o,3.0,{axis:'y',x:br,y:yc+br+1.5});
-  pipe(o,yc-.12,{axis:'y',x:xt,y:(yc+.12)/2,r:.52,t:.06});box(o,1.3,.12,1.3,M.steel2,xt,.06,0);
-  arrow(a,V(xt,yc+1.0,2.0),V(xt,1.0,2.0),false);},
+  const yTop=yc+br-Math.sqrt((br+R)**2-br**2)+.15;          /* leg runs in line with the riser and stops on the back of the elbow */
+  pipe(o,yTop-.12,{axis:'y',x:br,y:(yTop+.12)/2,r:lr,t:.06});box(o,1.5,.12,1.5,M.steel2,br,.06,0);
+  arrow(a,V(br,yc+br+3.6,2.2),V(br,1.2,2.2),false);},
+ trunnion_s(o,a){const yc=3.0,lr=.6;ibeam(o,BEAM);pipe(o,6.4,{y:yc});
+  band(o,R+.06,R,Math.PI*1.18,Math.PI*1.82,1.8,M.steel2,0,yc);
+  pipe(o,yc-R-.05-.12,{axis:'y',y:(yc-R-.05+.12)/2,r:lr,t:.06});box(o,1.4,.12,1.4,M.steel2,0,.06,0);
+  restArrow(a,yc);},
  guide(o,a){ibeam(o,BEAM);const yc=tShoe(o)+R;insulatedPipe(o,yc);
   for(const s of [-1,1]){box(o,1.6,.44,.07,M.steel,0,.22,s*(.55+.06));box(o,1.6,.07,.42,M.steel,0,.035,s*(.55+.06+.21));}
   restArrow(a,yc);arrow(a,V(0,.55,-2.7),V(0,.55,2.7));},
@@ -168,10 +177,9 @@ const BUILD={
    box(o,len,.07,.34,M.steel,0,.035,s*.83);box(o,len,.24,.07,M.steel,0,.12,s*.63);box(o,len,.07,.24,M.steel,0,.205,s*.53);
    weldBead(o,0,.0,s*1.0,len);}
   arrow(a,V(0,yc+R+2.4,0),V(0,yc+R+.4,0));},
- anchor(o,a){ibeam(o,BEAM);const yc=tShoe(o,{base:1.3})+R;insulatedPipe(o,yc);
-  for(const x of [-.95,.95])for(const z of [-.5,.5])bolt(o,x,.06,z,.42,'y',.05);
-  for(const s of [-1,1])weldBead(o,0,.1,s*.65,2.4);
-  for(const x of [-.6,.6])for(const s of [-1,1]){const g=new THREE.Shape();g.moveTo(0,0);g.lineTo(.42,0);g.lineTo(0,.42);g.closePath();const m=add(ext(g,.08,'x'),M.steel2,o);m.position.set(x,.1,s*.05);m.scale.x=s;m.rotation.y=0;m.scale.set(1,1,1);m.rotation.y=s>0?0:Math.PI;m.position.z=s*.05;}
+ anchor(o,a){ibeam(o,BEAM);const mh=0;
+  const yc=tShoe(o,{base:1.3,y:mh})+R;insulatedPipe(o,yc);weldBead(o,0,yc-R+.01,.26,2.4);weldBead(o,0,yc-R+.01,-.26,2.4);
+  for(const z of [-.66,.66])weldBead(o,0,.02,z,1.0);for(const x of [-.52,.52])weldBead(o,x,-.02,0,1.3,'z');
   restArrow(a,yc);arrow(a,V(-2.0,.5,-2.6),V(-2.0,.5,2.6));arrow(a,V(-3.8,.5,1.6),V(-.4,.5,1.6));rotArrow(a,V(3.2,yc,0),R+.35);},
  clevis(o,a){const top=5.3;ibeam(o,BEAM,{y:top+1.1});box(o,.5,.12,.5,M.steel,0,top+.06,0);nut(o,0,top-.05,0,.15,.12);
   const yc=1.4,cr=R+.03,t=.08;pipe(o,6.4,{y:yc});rod(o,0,yc+R+.9,top,0,.075);nut(o,0,yc+R+.95,0,.15,.12);
@@ -216,7 +224,34 @@ const BUILD={
   const yc=2.4,px=.25+R+.95;pipe(o,6.4,{x:px,y:yc,axis:'z'});
   band(o,R+.12,R,Math.PI*.55,Math.PI*1.45,.34,M.steel,px,yc,0,'z');band(o,R+.12,R,-Math.PI*.45,Math.PI*.45,.34,M.steel,px,yc,0,'z');
   for(const s of [-1,1])box(o,.95,.1,.34,M.steel,px-R-.45,yc+s*.14,0);box(o,.5,.4,.34,M.steel,px-R-.05,yc,0);
-  arrow(a,V(-1.6,yc+1.6,0),V(3.8,yc+1.6,0));}
+  arrow(a,V(-1.6,yc+1.6,0),V(3.8,yc+1.6,0));},
+ vbase(o,a){box(o,2.2,.1,2.2,M.steel2,0,.05,0);for(const [x,z] of [[-.8,-.8],[.8,-.8],[-.8,.8],[.8,.8]])nut(o,x,.14,z,.09,.08);
+  const c0=.1,c1=2.7;add(new THREE.CylinderGeometry(.86,.86,c1-c0,56,1,true,Math.PI*.3,Math.PI*1.4),M.can,o).position.set(0,(c0+c1)/2,0);
+  cyl(o,.93,.12,M.steel2,0,c1,0,'y',56);cyl(o,.93,.12,M.steel2,0,c0+.06,0,'y',56);cyl(o,.66,.08,M.steel2,0,c1-.55,0,'y',48);
+  helix(o,0,c0+.2,c1-.6,.62,5,.1);
+  const ang=-Math.PI*.42;const sc=box(o,.05,1.5,.34,M.scale,Math.cos(ang)*.88,(c0+c1)/2,Math.sin(ang)*.88);sc.rotation.y=-ang;
+  const ind=box(o,.06,.06,.4,M.red,Math.cos(ang)*.9,(c0+c1)/2+.2,Math.sin(ang)*.9);ind.rotation.y=-ang;
+  cyl(o,.3,.8,M.galv,0,c1+.4,0,'y',32);for(let i=0;i<9;i++){const th=add(new THREE.TorusGeometry(.3,.02,6,24),M.zinc,o);th.rotation.x=Math.PI/2;th.position.set(0,c1+.12+i*.07,0);}
+  nut(o,0,c1+.12,0,.42,.14);cyl(o,.75,.1,M.steel2,0,c1+.85,0,'y',48);box(o,1.3,.05,1.1,M.ptfe,0,c1+.925,0);
+  const yc=tShoe(o,{y:c1+.95})+R;insulatedPipe(o,yc);arrow(a,V(2.4,yc+2.8,0),V(2.4,yc-.8,0));},
+ strut(o,a){const top=6.6;ibeam(o,BEAM,{y:top+1.1});
+  box(o,.9,.1,.9,M.steel2,0,top-.05,0);for(const s of [-1,1]){const l=box(o,.1,.55,.6,M.steel,s*.17,top-.37,0);}bolt(o,0,top-.45,0,.6,'x',.06);
+  const eye=(y)=>{const t=add(new THREE.TorusGeometry(.2,.08,12,28),M.zinc,o);t.rotation.y=Math.PI/2;t.position.set(0,y,0);const b=add(new THREE.SphereGeometry(.12,16,12),M.ss,o);b.position.set(0,y,0);};
+  const yc=1.4,yb=yc+R+.75;eye(top-.45);eye(yb);
+  cyl(o,.07,.45,M.galv,0,top-.9,0,'y',16);nut(o,0,top-1.16,0,.14,.12);cyl(o,.07,.45,M.galv,0,yb+.45,0,'y',16);nut(o,0,yb+.71,0,.14,.12);
+  cyl(o,.22,top-1.22-(yb+.77),M.steel,0,(top-1.22+yb+.77)/2,0,'y',28);
+  pipe(o,6.4,{y:yc});insul(o,-2.9,-.6,yc);insul(o,.6,2.9,yc);
+  band(o,R+.12,R,-Math.PI/2,Math.PI/2,.4,M.steel,0,yc);band(o,R+.12,R,Math.PI/2,Math.PI*1.5,.4,M.steel,0,yc);
+  for(const s of [-1,1])box(o,.4,.7,.1,M.steel,0,yc+R+.38,s*.17);bolt(o,0,yb,0,.6,'z',.06);bolt(o,0,yc+R+.2,0,.6,'z',.05);
+  arrow(a,V(2.4,yc+2.8,0),V(2.4,yc-.8,0));},
+ bellow(o,a){const yc=2.2,fr=2.05;
+  for(const s of [-1,1]){pipe(o,2.0,{x:s*2.6,y:yc});cyl(o,fr,.16,M.steel,s*1.55,yc,0,'x',56);cyl(o,R+.12,.6,M.steel2,s*1.2,yc,0,'x',48);
+   for(let i=0;i<3;i++){const an=Math.PI/2+i*Math.PI*2/3;const z=Math.cos(an)*1.8,y=yc+Math.sin(an)*1.8;box(o,.16,.5,.5,M.steel,s*1.55,y,z).rotation.x=an;}}
+  for(let i=0;i<9;i++){const t=add(new THREE.TorusGeometry(R+.22,.13,14,56),M.ss,o);t.rotation.y=Math.PI/2;t.position.set(-.88+i*.22,yc,0);}
+  pipe(o,1.9,{y:yc,r:R+.1,t:.05});
+  for(let i=0;i<3;i++){const an=Math.PI/2+i*Math.PI*2/3;const z=Math.cos(an)*1.8,y=yc+Math.sin(an)*1.8;cyl(o,.07,4.2,M.galv,0,y,z,'x',16);
+   for(const x of [-1.78,-1.35,1.35,1.78])nut(o,x,y,z,.14,.12,'x');}
+  arrow(a,V(-2.2,yc+R+1.9,0),V(2.2,yc+R+1.9,0));}
 };
 
 /* ============================================================ display */
@@ -236,10 +271,10 @@ const ICON={Down:'<path d="M12 4v15M6 13l6 6 6-6"/>',Up:'<path d="M12 20V5M6 11l
 const DN=['Down','Up','Sideways','Along','Turning'],ST={R:'Held',P:'Slides',F:'Free'};
 function renderInfo(s){const vis=visible();
  document.getElementById('sp-info').innerHTML=`<div><div class="sp-kicker">${GROUPS[s.g]} · ${vis.indexOf(cur)+1} of ${vis.length}</div><h3>${s.name}</h3></div>
- <div>${s.type?`<span class="sp-tag">MSS SP-58 Type ${s.type}</span>`:`<span class="sp-tag sp-fab">Fabricated · project standard</span>`}</div>
+ <div>${s.type?`<span class="sp-tag">MSS SP-58 Type ${s.type}</span>`:`<span class="sp-tag sp-fab">${s.tag||'Fabricated · project standard'}</span>`}</div>
  <p class="sp-fn">${s.fn}</p>
- <div class="sp-dirs" role="list" aria-label="What it does in each direction">${[...s.dof].map((d,i)=>`<div class="sp-dir ${d}" role="listitem"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[DN[i]]}</svg><b>${DN[i]}</b><span>${ST[d]}</span></div>`).join('')}</div>
- <p class="sp-key"><i></i>Blue arrows on the model show the directions it holds.</p>
+ ${s.dof?`<div class="sp-dirs" role="list" aria-label="What it does in each direction">${[...s.dof].map((d,i)=>`<div class="sp-dir ${d}" role="listitem"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON[DN[i]]}</svg><b>${DN[i]}</b><span>${ST[d]}</span></div>`).join('')}</div>`:''}
+ <p class="sp-key"><i></i>${s.key||'Blue arrows on the model show the directions it holds.'}</p>
  <p class="sp-use"><b>Used for:</b> ${s.use}</p>`;}
 let need=3,awake=false;
 function resize(){if(!renderer)return;need=3;const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(model)frame(model,camera,controls);}
