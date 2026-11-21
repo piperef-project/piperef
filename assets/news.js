@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-21c',date:'21 Nov 2026',tag:'Update',title:'Flange joint: more gaskets, bolting and sizes',text:'Ring joint and kammprofile gaskets, B7M, L7M and B8 Class 2 bolting, lubricant choice, B16.47 large flanges and a full bolt table you can download.',href:'flange-joint.html'},
 {id:'2026-11-21b',date:'21 Nov 2026',tag:'New page',title:'Refinery units for piping engineers',text:'Follow a barrel of crude through the refinery, then see each unit with its typical conditions and the piping watch-outs.',href:'refinery-units.html'},
 {id:'2026-11-21a',date:'21 Nov 2026',tag:'New page',title:'Piping fundamentals',text:'Learn piping step by step: scroll to build a small piping system, then see how it is designed on a real job. Switch to a normal reading view any time.',href:'piping-basics.html'},
 {id:'2026-11-20a',date:'20 Nov 2026',tag:'Update',title:'More pipe supports in 3D',text:'Added the variable spring support (base type), rigid strut and expansion bellows.',href:'pipe-supports.html'},
