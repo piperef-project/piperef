@@ -1,8 +1,8 @@
 /* P&ID take-off: load a PDF P&ID, teach each symbol once, find them all, trace the lines and count per line number.
    Everything runs in the browser; the PDF never leaves the computer. Engine in pidcore.js, PDF reading by pdf.js (Apache-2.0). */
-import {extract,makeTemplate,findAll,guessPipeW,trace} from './pidcore.js?v=20261121e';
+import {extract,makeTemplate,findAll,guessPipeW,trace} from './pidcore.js?v=20261121f';
 const P=document.getElementById('p-pidto');
-const V='20261121e';
+const V='20261121f';
 if(!document.getElementById('pt-css')){const st=document.createElement('style');st.id='pt-css';st.textContent=`
 #p-pidto .pt-note{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border:1px solid var(--rule);border-radius:12px;background:var(--paper,#F7F9FC);font-size:13.5px;line-height:1.5;color:var(--ink-2);margin:12px 0}
 #p-pidto .pt-note svg{flex:none;width:18px;height:18px;margin-top:1px;stroke:#147A4A;fill:none;stroke-width:2}
