@@ -124,7 +124,7 @@ function show3d(r){const st=P.querySelector('#srStage');if(!st||r.err)return;
  const key=r.t==='orifice'?S.f:r.t==='venturi'?S.vf:S.d,map=(FITMAP[r.t]||FITMAP.other)[key]||[key],
   p={t:r.t,fit:map[0],ratio:map[1],up:r.up,dn:r.dn,beta:+S.beta,upmm:mm(r.up*r.pid.id)+' mm',dnmm:mm(r.dn*r.pid.id)+' mm'};
  const go=m=>{M3D=m;const ld=st.querySelector('.sr-load');if(!m.mount(st)){if(ld)ld.outerHTML=fig(r);return;}if(ld)ld.remove();m.update(p);if(VIEW==='inst')m.view('inst');};
- if(M3D)go(M3D);else import('./sr3d.js?v=20261121d').then(go).catch(()=>{const ld=st.querySelector('.sr-load');if(ld)ld.outerHTML=fig(r);});}
+ if(M3D)go(M3D);else import('./sr3d.js?v=20261121e').then(go).catch(()=>{const ld=st.querySelector('.sr-load');if(ld)ld.outerHTML=fig(r);});}
 
 function fig(r){
  const D=r.pid.id,up=r.up||0,dn=r.dn||0,tot=up+dn,W=760,x0=150,x1=W-60,sc=(x1-x0)/Math.max(tot,1),xo=x0+up*sc,y=80;
