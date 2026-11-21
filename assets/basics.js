@@ -103,7 +103,7 @@ if(!document.getElementById('pb-css')){const st=document.createElement('style');
 @media (prefers-reduced-motion:reduce){#p-basics .dr,#p-basics .fi,#p-basics .pb-sb{animation:none!important;stroke-dasharray:none!important}#p-basics .pb-iso .lay{transition:none}}
 @media (max-width:900px){
  #p-basics .pb-bar{margin:0 -16px}
- #p-basics .pb-stk{grid-template-columns:1fr;grid-template-rows:46% 54%;gap:10px;align-items:stretch;padding:8px 0}
+ #p-basics .pb-stk{grid-template-columns:1fr;grid-template-rows:56% 44%;gap:10px;align-items:stretch;padding:8px 0}
  #p-basics .pb-fig{padding:8px;border-radius:12px}
  #p-basics .pb-txt{justify-content:flex-start}
  #p-basics .pb-txt h2{font-size:19px}#p-basics .pb-txt>p{display:none}
@@ -494,14 +494,28 @@ function read(){let s=head();
 function figHTML(c){const F=FIG[c.f]();return Array.isArray(F)?F.map((f,i)=>`<div class="pb-one" data-i="${i}">${f}</div>`).join(''):F;}
 function end(){return `<div class="pb-end"><h2>Keep going</h2><p>Test yourself with the <a href="interview-questions.html">interview questions</a>, look up terms in the <a href="glossary.html">glossary</a>, or read the <a href="knowledge-base.html">knowledge base</a>.</p></div>`;}
 
+/* mobile: zoom the drawing onto the part being explained */
+const small=()=>matchMedia('(max-width:700px)').matches;
+function focusBox(svg,els,mapDesk){const vb=(svg.dataset.vb||svg.getAttribute('viewBox')).split(' ').map(Number);svg.dataset.vb=vb.join(' ');
+ if((!small()&&!mapDesk)||!els.length)return vb;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+ els.forEach(e=>{try{const b=e.getBBox();if(!b.width&&!b.height)return;x0=Math.min(x0,b.x);y0=Math.min(y0,b.y);x1=Math.max(x1,b.x+b.width);y1=Math.max(y1,b.y+b.height);}catch(_){}});
+ if(x0>x1)return vb;const pad=40;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
+ const box=svg.parentElement.getBoundingClientRect(),ar=(box.width||1)/(box.height||1);const mf=small()?.5:.62;let w=Math.max(x1-x0,vb[2]*mf),h=Math.max(y1-y0,vb[3]*mf*.84);
+ if(w/h<ar)w=h*ar;else h=w/ar;
+ const cx=(x0+x1)/2,cy=(y0+y1)/2,fit=(c,size,o,full)=>size>=full?o+(full-size)/2:Math.min(Math.max(c-size/2,o),o+full-size);return [fit(cx,w,vb[0],vb[2]),fit(cy,h,vb[1],vb[3]),w,h];}
+function animVB(svg,to){const from=(svg.getAttribute('viewBox')).split(' ').map(Number);if(svg._a)cancelAnimationFrame(svg._a);
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches){svg.setAttribute('viewBox',to.map(f1).join(' '));return;}
+ const t0=performance.now(),D=450;const step=t=>{const k=Math.min(1,(t-t0)/D),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;svg.setAttribute('viewBox',from.map((v,i)=>f1(v+(to[i]-v)*e)).join(' '));if(k<1)svg._a=requestAnimationFrame(step);};svg._a=requestAnimationFrame(step);}
+
 let SC=[],raf=0;
 function render(){P.dataset.mode=MODE;P.innerHTML=MODE==='story'?story():read();
- if(MODE==='read'){P.querySelectorAll('.pb-fig[data-k]').forEach(f=>setIso(f.querySelector('svg'),+f.dataset.k));P.querySelectorAll('.fg').forEach(g=>g.classList.remove('hl'));SC=[];return;}
+ if(MODE==='read'){P.querySelectorAll('.pb-fig[data-k]').forEach(f=>{const svg=f.querySelector('svg'),k=+f.dataset.k;setIso(svg,k);if(small()&&k>0)requestAnimationFrame(()=>svg.setAttribute('viewBox',focusBox(svg,[...svg.querySelectorAll('.lay.now')]).map(f1).join(' ')));});P.querySelectorAll('.fg').forEach(g=>g.classList.remove('hl'));SC=[];return;}
  SC=[...P.querySelectorAll('.pb-sc')].map(sec=>({sec,n:+sec.dataset.n,i:-1,svg:sec.querySelector('svg'),iso:sec.id==='pb-build',items:[...sec.querySelectorAll('.pb-steps>li,.pb-pts>li')],cnt:sec.querySelector('.pb-cnt')}));
  SC.forEach(sc=>{sc.items.forEach((li,i)=>li.addEventListener('click',e=>{if(e.target.closest('a'))return;jump(sc,i);}));if(!sc.iso)sc.svg.querySelectorAll('.fg').forEach(g=>g.classList.remove('hl'));setStep(sc,0);});
  onScroll();}
 function setStep(sc,i){if(sc.i===i)return;sc.i=i;sc.items.forEach((li,k)=>{li.classList.toggle('on',k===i);li.classList.toggle('done',k<i);});
  sc.sec.querySelectorAll('.pb-one').forEach(d=>d.classList.toggle('on',+d.dataset.i===i));if(sc.iso)setIso(sc.svg,i);else sc.svg.querySelectorAll('[data-h]').forEach(g=>g.classList.toggle('hl',g.dataset.h.split(' ').includes(String(i))));
+ if(!sc.sec.querySelector('.pb-one')){const els=sc.iso?[...sc.svg.querySelectorAll('.lay.now')]:[...sc.svg.querySelectorAll('.hl')];animVB(sc.svg,focusBox(sc.svg,els,sc.iso&&i>0));}
  if(sc.cnt)sc.cnt.textContent=`${i+1} of ${sc.n} · keep scrolling`;}
 function topH(){const t=document.querySelector('.top');return t?t.offsetHeight:56;}
 function jump(sc,i){const r=sc.sec.getBoundingClientRect(),stk=sc.sec.querySelector('.pb-stk'),tot=sc.sec.offsetHeight-stk.offsetHeight;
@@ -510,7 +524,7 @@ function onScroll(){if(raf||MODE!=='story'||P.hidden)return;raf=requestAnimation
  for(const sc of SC){const r=sc.sec.getBoundingClientRect(),stk=sc.sec.querySelector('.pb-stk'),tot=sc.sec.offsetHeight-stk.offsetHeight;const p=Math.min(.9999,Math.max(0,(th-r.top)/Math.max(tot,1)));setStep(sc,Math.floor(p*sc.n));if(r.top<=th+40&&r.bottom>th+40)cur=sc.sec.id;}
  const pr=P.getBoundingClientRect(),bar=P.querySelector('.pb-bar i');if(bar)bar.style.width=Math.min(100,Math.max(0,(th-pr.top)/Math.max(pr.height-innerHeight,1)*100))+'%';
  P.querySelectorAll('.pb-toc a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur));});}
-addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);
+addEventListener('scroll',onScroll,{passive:true});let rz=0;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{SC.forEach(sc=>{const i=sc.i;sc.i=-1;setStep(sc,i);});onScroll();},200);});
 P.addEventListener('click',e=>{const b=e.target.closest('.pb-mode button');if(b&&b.dataset.mode!==MODE){const id=[...P.querySelectorAll('.pb-sc,.pb-rd')].find(s=>s.getBoundingClientRect().bottom>topH()+80)?.id;MODE=b.dataset.mode;sv('basics_mode',MODE);render();
   if(id){const el=document.getElementById(id);if(el)window.scrollTo({top:window.scrollY+el.getBoundingClientRect().top-topH()-10});}return;}
  const a=e.target.closest('.pb-toc a');if(a){e.preventDefault();const el=P.querySelector(a.getAttribute('href'));if(el)window.scrollTo({top:window.scrollY+el.getBoundingClientRect().top-topH()-(MODE==='story'?3:10),behavior:'smooth'});}});

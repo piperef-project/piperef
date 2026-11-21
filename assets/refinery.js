@@ -456,8 +456,8 @@ function focusBox(svg,els,mapDesk){const vb=(svg.dataset.vb||svg.getAttribute('v
  els.forEach(e=>{try{const b=e.getBBox();if(!b.width&&!b.height)return;x0=Math.min(x0,b.x);y0=Math.min(y0,b.y);x1=Math.max(x1,b.x+b.width);y1=Math.max(y1,b.y+b.height);}catch(_){}});
  if(x0>x1)return vb;const pad=40;x0-=pad;y0-=pad;x1+=pad;y1+=pad;
  const box=svg.parentElement.getBoundingClientRect(),ar=(box.width||1)/(box.height||1);const mf=small()?.5:.62;let w=Math.max(x1-x0,vb[2]*mf),h=Math.max(y1-y0,vb[3]*mf*.84);
- if(w/h<ar)w=h*ar;else h=w/ar;if(w>vb[2]){w=vb[2];h=Math.min(vb[3],w/ar);}if(h>vb[3]){h=vb[3];w=Math.min(vb[2],h*ar);}
- const cx=(x0+x1)/2,cy=(y0+y1)/2;let nx=Math.min(Math.max(cx-w/2,vb[0]),vb[0]+vb[2]-w),ny=Math.min(Math.max(cy-h/2,vb[1]),vb[1]+vb[3]-h);return [nx,ny,w,h];}
+ if(w/h<ar)w=h*ar;else h=w/ar;
+ const cx=(x0+x1)/2,cy=(y0+y1)/2,fit=(c,size,o,full)=>size>=full?o+(full-size)/2:Math.min(Math.max(c-size/2,o),o+full-size);return [fit(cx,w,vb[0],vb[2]),fit(cy,h,vb[1],vb[3]),w,h];}
 function animVB(svg,to){const from=(svg.getAttribute('viewBox')).split(' ').map(Number);if(svg._a)cancelAnimationFrame(svg._a);
  if(matchMedia('(prefers-reduced-motion:reduce)').matches){svg.setAttribute('viewBox',to.map(f1).join(' '));return;}
  const t0=performance.now(),D=450;const step=t=>{const k=Math.min(1,(t-t0)/D),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;svg.setAttribute('viewBox',from.map((v,i)=>f1(v+(to[i]-v)*e)).join(' '));if(k<1)svg._a=requestAnimationFrame(step);};svg._a=requestAnimationFrame(step);}
