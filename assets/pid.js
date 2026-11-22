@@ -46,6 +46,9 @@ const Y=44,stub=`M4 ${Y}H34M66 ${Y}H96`;
 const bow=(fill='')=>`<path d="M34 ${Y-11}L50 ${Y}L34 ${Y+11}Z"${fill==='L'?' class="f"':''}/><path d="M66 ${Y-11}L50 ${Y}L66 ${Y+11}Z"${fill==='R'?' class="f"':''}/>`;
 const stem=(top=22)=>`<path d="M50 ${Y}V${top}"/>`;
 const V=inner=>`<path d="${stub}"/>${inner}`;
+const BALL=`<path d="M34 ${Y-8}L50 ${Y}L34 ${Y+8}Z"/><path d="M66 ${Y-8}L50 ${Y}L66 ${Y+8}Z"/><circle class="w" cx="50" cy="${Y}" r="8"/>`;
+const CHK=`<path d="M4 ${Y}H36M64 ${Y}H96M36 ${Y-10}V${Y+10}M64 ${Y-10}V${Y+10}"/><path d="M36 ${Y-10}L59.9 ${Y+7.1}"/><path class="f" d="M64 ${Y+10}L55.4 ${Y+8.3}L59.6 ${Y+2.4}Z" stroke="none"/><circle class="f" cx="36" cy="${Y-10}" r="2.6" stroke="none"/>`;
+
 const dome=`<path d="M37 20A13 12 0 0 1 63 20Z"/>`+stem(20);
 const box=t=>stem(26)+`<rect x="40" y="8" width="20" height="18"/><text class="t" x="50" y="22" text-anchor="middle">${t}</text>`;
 const LN=(inner,vb='0 0 120 40')=>({vb,s:inner});
@@ -77,10 +80,10 @@ const S=[
 /* manual valves */
 {c:'valves',n:'Gate valve',d:'On/off isolation, full bore, low pressure drop. Not for throttling.',vb:vb64,s:V(bow())},
 {c:'valves',n:'Globe valve',d:'Throttling and flow regulation; higher pressure drop. Often used for bypasses and drains.',vb:vb64,s:V(bow()+`<circle class="f" cx="50" cy="${Y}" r="5"/>`)},
-{c:'valves',n:'Ball valve',d:'Quarter-turn on/off valve, tight shut-off.',vb:vb64,s:V(bow()+`<circle class="w" cx="50" cy="${Y}" r="7"/>`)},
+{c:'valves',n:'Ball valve',d:'Quarter-turn on/off valve, tight shut-off.',vb:vb64,s:V(BALL)},
 {c:'valves',n:'Plug valve',d:'Quarter-turn valve with a tapered or cylindrical plug; on/off and diverting service.',vb:vb64,s:V(bow()+`<rect class="f" x="46" y="${Y-8}" width="8" height="16"/>`)},
 {c:'valves',n:'Butterfly valve',d:'Quarter-turn disc valve for large sizes, low pressure; on/off or coarse throttling.',vb:vb64,s:`<path d="M4 ${Y}H38M62 ${Y}H96M38 ${Y-14}V${Y+14}M62 ${Y-14}V${Y+14}M42 ${Y+11}L58 ${Y-11}"/><circle class="f" cx="50" cy="${Y}" r="2.6"/>`},
-{c:'valves',n:'Check valve',d:'Non-return valve; lets flow pass one way only. The filled side / arrow shows the allowed direction.',vb:vb64,s:V(bow('R'))+`<path d="M36 20H62"/><path class="f" d="M60 15L69 20L60 25Z" stroke="none"/>`},
+{c:'valves',n:'Check valve',d:'Non-return (swing check) valve; lets flow pass one way only. The disc hinges at the dot and the arrow shows the allowed flow direction.',vb:vb64,s:CHK},
 {c:'valves',n:'Needle valve',d:'Fine flow control on small lines, instrument and sample connections.',vb:vb64,s:V(bow())+`<path d="M50 ${Y}V20M42 20H58"/><path class="f" d="M46 ${Y-9}L54 ${Y-9}L50 ${Y-2}Z" stroke="none"/>`},
 {c:'valves',n:'Diaphragm valve',d:'Flexible diaphragm closes on a weir; corrosive, slurry or clean service.',vb:vb64,s:V(bow())+`<path d="M38 ${Y-14}Q50 ${Y-26} 62 ${Y-14}"/>`},
 {c:'valves',n:'Angle valve',d:'Globe-type valve with inlet and outlet at 90°.',vb:'0 0 100 80',s:`<path d="M4 34H34M50 50V76"/><path d="M34 23L50 34L34 45Z"/><path d="M39 50L50 34L61 50Z"/>`},
@@ -205,7 +208,7 @@ VV('Vacuum relief valve','Opens to admit air or gas when vacuum exceeds the set 
 VV('Rupture disc with relief valve','Bursting disc under a relief valve to isolate the PSV from corrosive process; a pressure gauge or tell-tale is fitted between them.',`<path d="M50 96V84M40 84H60M40 78H60"/><path d="M40 84Q50 74 60 84"/><path d="M50 78V64M66 46H96"/><path d="M39 64L50 46L61 64Z"/><path d="M66 35L50 46L66 57Z"/><path d="M50 46V14"/><path class="tn" d="M43 40L57 35L43 30L57 25L43 20"/>`,'0 0 100 100','act'),
 VV('Electro-hydraulic actuator','Electric pump and hydraulic cylinder in one unit (EH); large or fast-acting valves.',V(bow())+box('EH'),vb64,'act'),
 VV('Gear-operated valve','Manual valve with a gearbox and handwheel for large sizes or high torque.',V(bow())+stem(28)+`<rect x="42" y="16" width="16" height="12"/><path d="M58 22H72M72 14V30"/>`,vb64,'act'),
-VV('Lever-operated valve','Quarter-turn valve with a lever, for example small ball and plug valves.',V(bow()+`<circle class="w" cx="50" cy="${Y}" r="7"/>`)+`<path d="M50 ${Y-7}V26L74 20"/>`,vb64,'act'),
+VV('Lever-operated valve','Quarter-turn valve with a lever, for example small ball and plug valves.',V(BALL)+`<path d="M50 ${Y-7}V26L74 20"/>`,vb64,'act'),
 VV('Solenoid with manual reset','Solenoid that must be reset by hand after a trip (R); ESD actuators.',V(bow())+box('S')+`<text class="ts" x="66" y="16">R</text>`,vb64,'act'),
 VV('Actuator with 3-way solenoid','On/off valve whose actuator air is switched by a 3-way solenoid; vents the actuator to fail-safe.',V(bow())+stem(24)+`<rect x="40" y="6" width="20" height="18"/><path d="M40 15H60"/><path class="tn" d="M60 15H72"/><rect x="72" y="7" width="16" height="16"/><text class="ts" x="80" y="19" text-anchor="middle">S</text>`,vb64,'act'),
 VV('Fail last / fail locked (FL)','Valve stays in its last position on loss of air or power.',V(bow())+dome+`<path class="tn" d="M68 ${Y-14}V${Y+6}"/><text class="ts" x="74" y="${Y+12}">FL</text>`,vb64,'act'),
