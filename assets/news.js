@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-22a',date:'22 Nov 2026',tag:'Update',title:'Where to support',text:'New on the Pipe supports page: typical support arrangements at pumps, exchangers, columns, relief valves, racks, control valve stations, tank nozzles and small-bore branches.',href:'pipe-supports.html#where-to-support'},
 {id:'2026-11-21c',date:'21 Nov 2026',tag:'Update',title:'Flange joint: more gaskets, bolting and sizes',text:'Ring joint and kammprofile gaskets, B7M, L7M and B8 Class 2 bolting, lubricant choice, B16.47 large flanges and a full bolt table you can download.',href:'flange-joint.html'},
 {id:'2026-11-21c',date:'21 Nov 2026',tag:'New tool',title:'P&ID take-off from PDF',text:'Open a PDF P&ID, teach each symbol once, and get valve, flange and tee counts for every line. The file never leaves your computer.',href:'pid-takeoff.html'},
 {id:'2026-11-21b',date:'21 Nov 2026',tag:'New page',title:'Refinery units for piping engineers',text:'Follow a barrel of crude through the refinery, then see each unit with its typical conditions and the piping watch-outs.',href:'refinery-units.html'},
