@@ -46,7 +46,7 @@ function pageBar(){const k=document.body.dataset.page;if(k==='home'||$('.pagebar
  const g=typeof tabGroup==='function'?tabGroup(k):'',lbl=(TABS.find(t=>t[0]===k)||[,''])[1],std=(TAB_STD[k]||'');
  const chips=std&&std!=='All tables'?std.split(' / ').map(s=>`<span class="std-chip"><i></i>${/^(B|PFI)/.test(s)?'ASME ':''}${esc(s)}</span>`).join(''):'';
  const bar=document.createElement('div');bar.className='pagebar';
- bar.innerHTML=`<ol class="crumbs" aria-label="Breadcrumb"><li><a href="index.html">Home</a></li>${g&&g!==lbl?`<li><span>${esc(g)}</span></li>`:''}<li><span aria-current="page">${esc(lbl)}</span></li></ol><div class="stds" aria-label="Governing standards">${chips}</div>`;
+ bar.innerHTML=`<ol class="crumbs" aria-label="Breadcrumb"><li><a href="./">Home</a></li>${g&&g!==lbl?`<li><span>${esc(g)}</span></li>`:''}<li><span aria-current="page">${esc(lbl)}</span></li></ol><div class="stds" aria-label="Governing standards">${chips}</div>`;
  $('#main').prepend(bar);
  /* data version chip, from the correction log */
  const API=(()=>{try{return localStorage.getItem('pr_api')||'https://api.piperef.site'}catch(e){return 'https://api.piperef.site'}})();
