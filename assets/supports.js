@@ -310,4 +310,4 @@ document.getElementById('sp-tSpin').setAttribute('aria-pressed',String(spinOn));
 addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('input,select,textarea,[contenteditable]')||document.getElementById('cmdk')&&!document.getElementById('cmdk').hidden)return;if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1);});
 show(0);gallery();
 
-import('./suploc.js?v=20261122a').catch(()=>{});
+import('./suploc.js?v=20261122b').catch(()=>{});

@@ -1,6 +1,8 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-22c',date:'22 Nov 2026',tag:'New',title:'Piping guides',text:'Ten short guides: gate vs globe valves, pipe schedules, weld neck vs slip-on, RF vs RTJ, trunnions, supports, expansion loops, hydrotest, elbows and line blinds.',href:'guides.html'},
+{id:'2026-11-22b',date:'22 Nov 2026',tag:'New tool',title:'Hydrotest pressure calculator',text:'B31.3 and B31.1 test pressure with static head at low points, a yield check, the B16.5 flange limit and the water volume.',href:'hydrotest-pressure.html'},
 {id:'2026-11-22a',date:'22 Nov 2026',tag:'Update',title:'Where to support',text:'New on the Pipe supports page: typical support arrangements at pumps, exchangers, columns, relief valves, racks, control valve stations, tank nozzles and small-bore branches.',href:'pipe-supports.html#where-to-support'},
 {id:'2026-11-21c',date:'21 Nov 2026',tag:'Update',title:'Flange joint: more gaskets, bolting and sizes',text:'Ring joint and kammprofile gaskets, B7M, L7M and B8 Class 2 bolting, lubricant choice, B16.47 large flanges and a full bolt table you can download.',href:'flange-joint.html'},
 {id:'2026-11-21c',date:'21 Nov 2026',tag:'New tool',title:'P&ID take-off from PDF',text:'Open a PDF P&ID, teach each symbol once, and get valve, flange and tee counts for every line. The file never leaves your computer.',href:'pid-takeoff.html'},
