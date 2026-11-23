@@ -1055,3 +1055,5 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 [data-theme=dark] #p-tag .tg-parts .l b{border-color:#8AB0FF}[data-theme=dark] #p-tag .tg-ex:hover{border-color:#8AB0FF;color:#8AB0FF}
 [data-theme=dark] #p-tag .tg-x td{background:#3B1111}[data-theme=dark] #p-tag .tg-err{color:#FCA5A5}[data-theme=dark] #p-tag .tg-badge{background:#4A3A10;color:#FDE68A}
 #p-tag .tg-t td:nth-child(3),#p-tag .tg-t td:nth-child(4){white-space:normal}
+.gd-fig{margin:18px 0 22px}.gd-fig svg{display:block;width:100%;max-width:640px;height:auto;color:var(--ink)}
+.gd-fig figcaption{font-size:13px;color:var(--muted);margin-top:6px}
