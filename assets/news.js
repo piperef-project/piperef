@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-23a',date:'23 Nov 2026',tag:'New tool',title:'Instrument tag decoder',text:'Type a tag like FIC-101 or LAHH-3301 and read each letter, the loop number and what the piping layout must allow for.',href:'instrument-tag-decoder.html'},
 {id:'2026-11-22d',date:'22 Nov 2026',tag:'New',title:'Two more guides',text:'P&ID valve symbols with drawings, and how to calculate pipe cut length from an isometric.',href:'pid-valve-symbols.html'},
 {id:'2026-11-22c',date:'22 Nov 2026',tag:'New',title:'Piping guides',text:'Ten short guides: gate vs globe valves, pipe schedules, weld neck vs slip-on, RF vs RTJ, trunnions, supports, expansion loops, hydrotest, elbows and line blinds.',href:'guides.html'},
 {id:'2026-11-22b',date:'22 Nov 2026',tag:'New tool',title:'Hydrotest pressure calculator',text:'B31.3 and B31.1 test pressure with static head at low points, a yield check, the B16.5 flange limit and the water volume.',href:'hydrotest-pressure.html'},
