@@ -994,3 +994,15 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 .hero-trust{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--ink-2)}.hero-trust li{display:flex;align-items:center;gap:6px}.hero-trust svg{width:16px;height:16px;flex:none;fill:none;stroke:#147A4A;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .gd-sym{color:var(--ink);display:block}.gd-symt td:nth-child(2){width:80px}
 .gd-t td,.gd-t th{white-space:normal}
+
+/* Ask a question */
+.askbtn{height:36px;display:inline-flex;align-items:center;gap:7px;padding:0 13px 0 10px;border-radius:var(--r);background:#FACC15;color:#1A1A1A;font-weight:700;font-size:13.5px;text-decoration:none;flex:none;margin-left:12px;border:1px solid #E0B400;white-space:nowrap}
+.askbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.askbtn:hover{background:#FDE047}.askbtn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (max-width:900px){.askbtn{width:36px;padding:0;justify-content:center;margin-left:8px}.askbtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+@media (max-width:760px){.askbtn{width:40px;height:40px}}
+.gd-ask{display:flex;align-items:center;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;margin:26px 0 0;padding:16px 18px;border:1px solid #E0B400;border-radius:14px;background:color-mix(in srgb,#FACC15 14%,var(--sheet))}
+.gd-ask div{display:flex;flex-direction:column;gap:3px;flex:1 1 260px}.gd-ask b{font-size:16px}.gd-ask span{font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.gd-ask a{display:inline-flex;align-items:center;height:40px;padding:0 18px;border-radius:var(--r);background:#FACC15;color:#1A1A1A;font-weight:700;text-decoration:none;border:1px solid #E0B400}
+.gd-ask a:hover{background:#FDE047}
+@media (max-width:520px){.askbtn{display:none}}
