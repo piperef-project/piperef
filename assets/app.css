@@ -1089,16 +1089,3 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 [data-theme=dark] #p-cad code{color:#8AB0FF}[data-theme=dark] #p-cad .cd-chip.on{background:#2B5BC4;border-color:#2B5BC4}
 @media (max-width:640px){#cdT td:nth-child(4),#cdT th:nth-child(4){display:none}#p-cad .cd-keys td:first-child{white-space:normal}#p-cad .cd-t td,#p-cad .cd-t th{padding:7px 8px}#p-cad .cd-t{font-size:13.5px}}
 @media print{#p-cad .cd-bar,#p-cad .cd-chips,#p-cad .note{display:none!important}#p-cad .cd-t{font-size:10px}#p-cad .cd-t td,#p-cad .cd-t th{padding:3px 6px}#p-cad .cd-flows{grid-template-columns:1fr 1fr}#p-cad .cd-tw{overflow:visible}}
-#p-cad .cd-ask{border:1px solid #E0B400;border-radius:14px;background:color-mix(in srgb,#FACC15 12%,var(--sheet));padding:16px 18px;margin-top:16px}
-#p-cad .cd-q2{max-width:620px}#p-cad .cd-q2 input{height:50px;font-size:17px}
-#p-cad .cd-exs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 2px;font-size:12.5px;color:var(--muted)}
-#p-cad .cd-ex{font:inherit;font-size:12.5px;font-weight:600;padding:4px 10px;border:1px solid var(--rule-strong);border-radius:999px;background:var(--sheet);color:var(--ink);cursor:pointer}
-#p-cad .cd-ex:hover{border-color:#1849A9;color:#1849A9}
-#p-cad #cdOut{display:grid;gap:8px;margin-top:10px}
-#p-cad .cd-ans{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 14px}
-#p-cad .cd-ans.best{border-color:#1849A9;box-shadow:0 0 0 1px #1849A9}
-#p-cad .cd-ans b{font-size:15px}#p-cad .cd-ans ol{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.6}
-#p-cad .cd-cmd{font:inherit;font-weight:800;color:#1849A9;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,#1849A9 35%,transparent);text-underline-offset:3px}
-#p-cad .cd-miss{font-size:14px;margin:4px 0 0}
-[data-theme=dark] #p-cad .cd-cmd{color:#8AB0FF}[data-theme=dark] #p-cad .cd-ans.best{border-color:#8AB0FF;box-shadow:0 0 0 1px #8AB0FF}
-@media print{#p-cad .cd-ask{display:none!important}}
