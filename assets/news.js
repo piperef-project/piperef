@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-24b',date:'24 Nov 2026',tag:'New',title:'Daily piping challenge',text:'A new piping question on the homepage every day, with the answer, the guide and the tool behind it. Keep your streak going.',href:'./'},
 {id:'2026-11-24a',date:'24 Nov 2026',tag:'New',title:'AutoCAD and BricsCAD commands for piping',text:'Searchable commands and aliases, piping workflows for isometrics, P&IDs and take-offs, and a printable cheat sheet.',href:'cad-commands-piping.html'},
 {id:'2026-11-23b',date:'23 Nov 2026',tag:'New',title:'Eight instrument and electrical guides',text:'Control valve stations, thermowells, pressure taps, level bridles, instrument tubing, earthing and bonding, insulating flange kits and cable trays on racks.',href:'guides.html'},
 {id:'2026-11-23a',date:'23 Nov 2026',tag:'New tool',title:'Instrument tag decoder',text:'Type a tag like FIC-101 or LAHH-3301 and read each letter, the loop number and what the piping layout must allow for.',href:'instrument-tag-decoder.html'},
