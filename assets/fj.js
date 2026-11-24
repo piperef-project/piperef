@@ -151,7 +151,7 @@ const tb=(h,rows)=>`<table class="fj-t"><thead><tr>${h.map(x=>`<th>${x}</th>`).j
 const fm=x=>U==='mm'?`${(Math.round(x*10)/10).toString()} mm`:`${(x/25.4).toFixed(2)}″`;
 const nm=x=>Math.round(x);
 function render(){
- if(is47()&&!window.B1647){P.innerHTML='<p class="note">Loading B16.47 data…</p>';import('./b1647.js?v=20261123c').then(render).catch(()=>{S.std='165';render();});return;}
+ if(is47()&&!window.B1647){P.innerHTML='<p class="note">Loading B16.47 data…</p>';import('./b1647.js?v=20261124c').then(render).catch(()=>{S.std='165';render();});return;}
  if(is47()&&!CL47[S.std].includes(S.cls))S.cls=CL47[S.std][0];
  if(is47()&&GK[S.gk].ring)S.gk='sw';
  if(!is47()&&!CLASSES.includes(S.cls))S.cls='300';

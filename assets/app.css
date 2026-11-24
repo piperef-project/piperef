@@ -1057,3 +1057,48 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 #p-tag .tg-t td:nth-child(3),#p-tag .tg-t td:nth-child(4){white-space:normal}
 .gd-fig{margin:18px 0 22px}.gd-fig svg{display:block;width:100%;max-width:640px;height:auto;color:var(--ink)}
 .gd-fig figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+/* CAD commands */
+#p-cad .cd-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;margin-top:16px}
+#p-cad .cd-q{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink-2);flex:1 1 280px;max-width:460px}
+#p-cad .cd-q input{height:44px;border:1px solid var(--rule-strong);border-radius:var(--r);padding:0 14px;font:inherit;font-size:16px;background:var(--sheet);color:var(--ink)}
+#p-cad .cd-print{height:44px;padding:0 16px;border-radius:var(--r);border:1px solid var(--rule-strong);background:var(--sheet);color:var(--ink);font:inherit;font-weight:650;cursor:pointer}
+#p-cad .cd-print:hover{border-color:#1849A9;color:#1849A9}
+#p-cad .cd-chips{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 12px}
+#p-cad .cd-chip{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border:1px solid var(--rule-strong);border-radius:999px;background:var(--sheet);color:var(--ink);cursor:pointer}
+#p-cad .cd-chip.on{background:#1849A9;border-color:#1849A9;color:#fff}
+#p-cad .cd-tw{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--r);background:var(--sheet)}
+#p-cad .cd-t{width:100%;border-collapse:collapse;font-size:14px}
+#p-cad .cd-t th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap}
+#p-cad .cd-t td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top;text-align:left;white-space:normal}
+#p-cad .cd-t tr:last-child td{border-bottom:0}
+#cdT td:first-child,#cdT td:nth-child(2){white-space:nowrap}
+#cdT td:nth-child(4){white-space:nowrap;font-size:12.5px;color:var(--muted)}
+#p-cad .cd-keys td:first-child{white-space:nowrap;width:1%}
+#p-cad tr[data-p="a"] td:nth-child(4){color:#B45309;font-weight:650}
+#p-cad code{font-family:inherit;font-weight:750;letter-spacing:.02em;color:#1849A9}
+#p-cad .cd-na{color:var(--muted)}
+#p-cad kbd{font-family:inherit;font-size:12.5px;font-weight:700;padding:2px 8px;border:1px solid var(--rule-strong);border-bottom-width:2px;border-radius:6px;background:var(--paper,#fff);white-space:nowrap}
+#p-cad .cd-empty{font-size:14px;color:var(--muted);margin:10px 0 0}
+#p-cad h2.cd-h{font-size:18px;margin:30px 0 10px}
+#p-cad .cd-flows{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+#p-cad .cd-flow{border:1px solid var(--rule);border-radius:14px;background:var(--sheet);padding:14px 16px}
+#p-cad .cd-flow h3{font-size:15px;margin:0 0 8px}#p-cad .cd-flow ol{margin:0;padding-left:20px;font-size:13.5px;line-height:1.55}#p-cad .cd-flow li+li{margin-top:4px}
+#p-cad .cd-keys{max-width:780px}
+#p-cad .cd-fix{border:1px solid var(--rule);border-radius:12px;background:var(--sheet);padding:10px 14px;margin-bottom:8px}
+#p-cad .cd-fix summary{cursor:pointer;font-weight:650;font-size:14.5px}#p-cad .cd-fix p{margin:8px 0 2px;font-size:14px;line-height:1.55}
+[data-theme=dark] #p-cad code{color:#8AB0FF}[data-theme=dark] #p-cad .cd-chip.on{background:#2B5BC4;border-color:#2B5BC4}
+@media (max-width:640px){#cdT td:nth-child(4),#cdT th:nth-child(4){display:none}#p-cad .cd-keys td:first-child{white-space:normal}#p-cad .cd-t td,#p-cad .cd-t th{padding:7px 8px}#p-cad .cd-t{font-size:13.5px}}
+@media print{#p-cad .cd-bar,#p-cad .cd-chips,#p-cad .note{display:none!important}#p-cad .cd-t{font-size:10px}#p-cad .cd-t td,#p-cad .cd-t th{padding:3px 6px}#p-cad .cd-flows{grid-template-columns:1fr 1fr}#p-cad .cd-tw{overflow:visible}}
+#p-cad .cd-ask{border:1px solid #E0B400;border-radius:14px;background:color-mix(in srgb,#FACC15 12%,var(--sheet));padding:16px 18px;margin-top:16px}
+#p-cad .cd-q2{max-width:620px}#p-cad .cd-q2 input{height:50px;font-size:17px}
+#p-cad .cd-exs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 2px;font-size:12.5px;color:var(--muted)}
+#p-cad .cd-ex{font:inherit;font-size:12.5px;font-weight:600;padding:4px 10px;border:1px solid var(--rule-strong);border-radius:999px;background:var(--sheet);color:var(--ink);cursor:pointer}
+#p-cad .cd-ex:hover{border-color:#1849A9;color:#1849A9}
+#p-cad #cdOut{display:grid;gap:8px;margin-top:10px}
+#p-cad .cd-ans{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:12px 14px}
+#p-cad .cd-ans.best{border-color:#1849A9;box-shadow:0 0 0 1px #1849A9}
+#p-cad .cd-ans b{font-size:15px}#p-cad .cd-ans ol{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.6}
+#p-cad .cd-cmd{font:inherit;font-weight:800;color:#1849A9;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,#1849A9 35%,transparent);text-underline-offset:3px}
+#p-cad .cd-miss{font-size:14px;margin:4px 0 0}
+[data-theme=dark] #p-cad .cd-cmd{color:#8AB0FF}[data-theme=dark] #p-cad .cd-ans.best{border-color:#8AB0FF;box-shadow:0 0 0 1px #8AB0FF}
+@media print{#p-cad .cd-ask{display:none!important}}
