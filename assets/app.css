@@ -95,7 +95,7 @@ button.navbtn{background:none;border:0;width:100%;font-family:inherit;cursor:poi
 .icobtn:hover{border-color:var(--muted);color:var(--ink)}
 .menu{display:none}
 
-.content{padding:20px 32px 48px;width:100%;max-width:1400px;outline:none}
+.content{padding:20px 32px 48px;width:100%;max-width:none;outline:none}
 .pagebar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 14px;font-size:13px;color:var(--muted)}
 .crumbs{display:flex;align-items:center;gap:6px;margin:0;padding:0;list-style:none}
 .crumbs li+li::before{content:"/";margin-right:6px;color:var(--rule-strong)}
@@ -566,7 +566,7 @@ details>summary{color:var(--ink-2)}
 
 /* ---------- footer ---------- */
 .foot{margin-top:auto;border-top:1px solid var(--rule);background:var(--sheet);padding:28px 32px 20px;font-size:13px;color:var(--muted)}
-.foot-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,.8fr) minmax(0,.8fr);gap:28px;max-width:1336px}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,.8fr) minmax(0,.8fr);gap:28px;max-width:none}
 .foot h3{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:8px}
 .foot-brand b{display:block;color:var(--ink);font-size:15px;font-weight:650;margin-bottom:6px}
 .foot-brand p{margin:0 0 10px;line-height:1.55;max-width:44ch}
@@ -574,7 +574,7 @@ details>summary{color:var(--ink-2)}
 .foot-std b{color:var(--ink-2);font-weight:550}
 .foot-links a,.foot-mail{color:var(--ink-2);text-decoration:none}
 .foot-links a:hover,.foot-mail:hover{color:var(--accent);text-decoration:underline}
-.foot-note{margin:24px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:12px;max-width:1336px}
+.foot-note{margin:24px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:12px;max-width:none}
 
 /* ---------- search dialog ---------- */
 .cmdk{position:fixed;inset:0;z-index:60;background:rgba(10,20,36,.36);display:flex;justify-content:center;align-items:flex-start;padding:12vh 12px 12px}
@@ -1199,3 +1199,6 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 .dc-sbar .dc-search{max-width:none;width:100%;background:var(--sheet);border:1px solid var(--rule);color:var(--ink);box-shadow:var(--sh-1)}
 .dc-sbar .dc-try span{color:var(--muted)}
 .dc-sbar .dc-try button{background:var(--sheet);border:1px solid var(--rule);color:var(--ink)}
+.dir-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1000px){.dir-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.dir-tiles{grid-template-columns:1fr}}
