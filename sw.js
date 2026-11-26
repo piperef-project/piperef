@@ -1,5 +1,5 @@
 /* Pipe Ref service worker: pages network-first (always fresh when online), assets cache-first by version, offline fallback. */
-const V='20261126a',CACHE='piperef-'+V;
+const V='20261126b',CACHE='piperef-'+V;
 const CORE=['./','index.html','assets/app.css?v='+V,'assets/app.js?v='+V,'assets/ui.js?v='+V,'assets/favicon.svg','assets/fonts/Geist-Variable.woff2','manifest.webmanifest','assets/icons/icon-192.png'];
 const OFFLINE=`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline – Pipe Ref</title>
 <body style="font-family:system-ui,sans-serif;background:#F5F7FA;color:#0F1B2D;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center">
