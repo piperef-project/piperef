@@ -2,8 +2,9 @@
    and (optionally) have Claude write the answer from those pages only, through Pipe Ref's /api/spec worker.
    PDF reading by pdf.js (Apache-2.0). The PDF itself never leaves the browser; in "Search only" nothing does. */
 const P=document.getElementById('p-spec');
-const V='20261127a';
+const V='20261127b';
 const API='https://spec.piperef.net/api/spec';
+const AI_ON=false; // AI answers come back later as a Pro feature
 if(!document.getElementById('sp-css')){const st=document.createElement('style');st.id='sp-css';st.textContent=`
 #p-spec .sp-app{margin:18px 0 28px;display:grid;gap:16px}
 #p-spec .sp-drop{border:2px dashed var(--rule);border-radius:16px;background:var(--sheet);padding:26px 20px;text-align:center;display:grid;gap:10px;justify-items:center}
@@ -55,7 +56,7 @@ if(!document.getElementById('sp-css')){const st=document.createElement('style');
 `;document.head.appendChild(st);}
 
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let pdfjs=null,doc=null,fileName='',pages=[],classes=[],mode='ai',aiOK=null,left=null;
+let pdfjs=null,doc=null,fileName='',pages=[],classes=[],mode=AI_ON?'ai':'search',aiOK=AI_ON?null:false,left=null;
 async function lib(){if(pdfjs)return pdfjs;pdfjs=await import(`./pdfjs/pdf.min.mjs?v=${V}`);pdfjs.GlobalWorkerOptions.workerSrc=new URL(`./pdfjs/pdf.worker.min.mjs?v=${V}`,import.meta.url).href;return pdfjs;}
 
 /* ---------- reading ---------- */
@@ -136,7 +137,7 @@ async function ask(q){
   if(!r.pick.length){out.innerHTML=`<div class="sp-ans"><p class="sp-off">Nothing in this PDF matches that question. Try the component name (gasket, bolting, branch, valve) and the class.</p></div>`;return;}
   const warn=r.unknown?`<p class="sp-off">Class ${esc(r.unknown)} was not found in this PDF. Classes found: ${classes.map(esc).join(', ')||'none'}.</p>`:'';
   const hits=`<section class="sp-hits"><h3>Pages that match</h3>${hitHTML(r)}</section>`;
-  if(mode!=='ai'||aiOK===false){out.innerHTML=(warn?`<div class="sp-ans">${warn}</div>`:'')+(mode==='ai'?`<div class="sp-ans"><p class="sp-off">AI answers are not switched on yet. The rows that match are highlighted below.</p></div>`:'')+hits;return;}
+  if(mode!=='ai'||aiOK===false){out.innerHTML=(warn?`<div class="sp-ans">${warn}</div>`:'')+(mode==='ai'&&AI_ON?`<div class="sp-ans"><p class="sp-off">AI answers are not switched on yet. The rows that match are highlighted below.</p></div>`:'')+hits;return;}
   out.innerHTML=`<div class="sp-ans"><h3>Answer</h3><p class="sp-busy" role="status">Reading pages ${r.pick.map(x=>x.p.n).join(', ')}…</p></div>`+hits;
   try{const res=await fetch(API,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({q,file:fileName,pages:r.pick.map(({p})=>({n:p.n,cls:p.cls,text:p.text.slice(0,12000)}))})});
     const j=await res.json().catch(()=>({}));if(j.remaining!=null){left=j.remaining;paintLeft();}
@@ -167,12 +168,12 @@ function ui(scanned){
   <div class="sp-file"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/></svg><div><b>${esc(fileName)}</b><br><small>${doc.numPages} pages · ${classes.length?`${classes.length} piping classes found`:'no class headers found'}</small></div><button type="button" class="sp-b" data-new>Open another PDF</button></div>
   ${scanned?'<p class="sp-err">This PDF has almost no text. It may be scanned pages, which this tool cannot read.</p>':''}
   ${classes.length?`<div class="sp-cls">Classes: ${classes.map(c=>`<button type="button" data-cls="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:''}
-  <div class="sp-ask"><form class="sp-q"><input type="text" id="spQ" placeholder="Ask about a class, size or component" aria-label="Your question" maxlength="300" autocomplete="off"><button class="sp-b pri" type="submit">Ask</button></form>
+  <div class="sp-ask"><form class="sp-q"><input type="text" id="spQ" placeholder="Search a class, size or component" aria-label="Your question" maxlength="300" autocomplete="off"><button class="sp-b pri" type="submit">Search</button></form>
   <div class="sp-ex">${ex.map(e=>`<button type="button">${esc(e)}</button>`).join('')}</div>
-  <div class="sp-row"><div class="sp-mode" role="group" aria-label="Answer mode"><button type="button" data-m="ai" aria-pressed="${mode==='ai'}">Ask AI</button><button type="button" data-m="search" aria-pressed="${mode!=='ai'}">Search only</button></div><span class="sp-left"></span></div>
-  <p class="sp-priv">${mode==='ai'?'Ask AI sends the 3 or 4 matching pages, as text, to Claude by Anthropic through Pipe Ref to write the answer. Nothing is stored. The PDF itself stays on your computer. If your spec is confidential, use Search only.':'Search only: nothing leaves your computer. You get the matching pages with the rows highlighted.'}</p></div>
+  ${AI_ON?`<div class="sp-row"><div class="sp-mode" role="group" aria-label="Answer mode"><button type="button" data-m="ai" aria-pressed="${mode==='ai'}">Ask AI</button><button type="button" data-m="search" aria-pressed="${mode!=='ai'}">Search only</button></div><span class="sp-left"></span></div>`:''}
+  <p class="sp-priv">${mode==='ai'?'Ask AI sends the 3 or 4 matching pages, as text, to Claude by Anthropic through Pipe Ref to write the answer. Nothing is stored. The PDF itself stays on your computer. If your spec is confidential, use Search only.':'Your spec is read inside your browser and nothing leaves your computer. You get the matching pages with the rows for your size highlighted.'}</p></div>
   <div class="sp-out"></div>`;
-  if(aiOK===null)status();else paintLeft();
+  if(AI_ON){if(aiOK===null)status();else paintLeft();}
 }
 P.addEventListener('submit',e=>{if(e.target.closest('.sp-q')){e.preventDefault();ask(P.querySelector('#spQ').value);}});
 P.addEventListener('click',e=>{const t=e.target;

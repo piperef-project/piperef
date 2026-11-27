@@ -1209,3 +1209,6 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 .dir-tiles .dt-feat .dt-ic svg{stroke:#0B1F4D}
 .dir-tiles .dt-feat .dt-ch{border-color:#FACC15}
 .dir-tiles .dt-feat:hover{box-shadow:0 12px 28px rgba(11,31,77,.35)}
+.ab-priv{list-style:none;margin:12px 0 14px;padding:0;display:grid;gap:10px}
+.ab-priv li{border:1px solid var(--rule);border-radius:12px;background:var(--sheet);padding:12px 14px;display:grid;gap:3px;font-size:14px;line-height:1.5}
+.ab-priv b{font-size:15px}.ab-priv em{font-style:normal;color:var(--muted)}
