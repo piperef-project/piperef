@@ -1202,3 +1202,10 @@ body[data-page^="gd_"] .top-ctrls>.tc,body[data-page="guides"] .top-ctrls>.tc{di
 .dir-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:1000px){.dir-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.dir-tiles{grid-template-columns:1fr}}
+.dir-tiles .dt-feat{grid-column:1/-1;background:linear-gradient(120deg,#0B1F4D,#1D3A7A);border-color:#0B1F4D;padding:20px 22px}
+.dir-tiles .dt-feat .dt-tx b{color:#fff;font-size:18px}
+.dir-tiles .dt-feat .dt-tx small{color:rgba(255,255,255,.78);white-space:normal}
+.dir-tiles .dt-feat .dt-ic{background:#FACC15}
+.dir-tiles .dt-feat .dt-ic svg{stroke:#0B1F4D}
+.dir-tiles .dt-feat .dt-ch{border-color:#FACC15}
+.dir-tiles .dt-feat:hover{box-shadow:0 12px 28px rgba(11,31,77,.35)}

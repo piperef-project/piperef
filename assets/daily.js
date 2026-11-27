@@ -1,5 +1,5 @@
 /* Daily piping challenge on the homepage. Same question for everyone on a given date; streak kept in this browser only. */
-import {START,Q} from './challenges.js?v=20261126c';
+import {START,Q} from './challenges.js?v=20261127a';
 const N=Q.length,KEY='piperef-daily';
 const [y0,m0,d0]=START.split('-').map(Number);
 const t=new Date(),dayN=Math.floor((Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())-Date.UTC(y0,m0-1,d0))/864e5);

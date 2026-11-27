@@ -54,7 +54,7 @@ function pageBar(){const k=document.body.dataset.page;if(k==='home'||$('.pagebar
  ('requestIdleCallback' in window)?requestIdleCallback(add,{timeout:3000}):setTimeout(add,1500);}
 
 /* ---------- search index ---------- */
-const KW={size:'line size summary everything one sheet',pipe:'od outside diameter wall thickness id inside diameter schedule weight kg/m b36.10 b36.19 pipe id flow area',
+const KW={spec:'piping spec specification pms piping class material gasket bolting branch table valve code ai assistant pdf',size:'line size summary everything one sheet',pipe:'od outside diameter wall thickness id inside diameter schedule weight kg/m b36.10 b36.19 pipe id flow area',
  flange:'b16.5 wn weld neck slip on socket weld threaded npt lap joint stub end blind flange bolt circle pcd stud bolting raised face rf hub class 400',pt:'pressure temperature rating class 150 300 400 600 900 1500 2500 material group 1.1 2.1 2.2 carbon steel 304 316 stainless flange rating',
  bw:'b16.9 elbow 90 45 tee reducer cap return lr sr butt weld centre to end center',sw:'b16.11 socket weld threaded npt coupling forged fittings 3000 6000 b1.20.1 thread',
  gasket:'b16.20 spiral wound gasket winding centering ring inner ring filler graphite ptfe',blind:'b16.48 spectacle figure 8 paddle blank spacer rtj line blind',

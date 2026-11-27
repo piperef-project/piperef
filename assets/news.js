@@ -1,6 +1,7 @@
 /* What's new: a small card shown once per release, bottom right. Newest first; bump nothing else, the first id is the release. */
 (function(){
 const NEWS=[
+{id:'2026-11-26a',date:'26 Nov 2026',tag:'New',title:'Piping spec assistant',text:'Open your piping spec PDF and ask for the gasket, bolting, branch fitting or valve of a class and size. Answers quote the page.',href:'piping-spec-assistant.html'},
 {id:'2026-11-24c',date:'24 Nov 2026',tag:'New',title:'Control valve station layout types',text:'Nine arrangements drawn in 2D, from bypass beside or above to angle, three-way and self-acting valves, with where each fits and its limits.',href:'control-valve-station-layout-types.html'},
 {id:'2026-11-24b',date:'24 Nov 2026',tag:'New',title:'Daily piping challenge',text:'A new piping question on the homepage every day, with the answer, the guide and the tool behind it. Keep your streak going.',href:'./'},
 {id:'2026-11-24a',date:'24 Nov 2026',tag:'New',title:'AutoCAD and BricsCAD commands for piping',text:'Searchable commands and aliases, piping workflows for isometrics, P&IDs and take-offs, and a printable cheat sheet.',href:'cad-commands-piping.html'},
